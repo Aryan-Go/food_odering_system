@@ -19,20 +19,9 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { add_data,check_email,find_role } from "./config/database.js";
+import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free } from "./config/database.js";
 
 import jwt from "jsonwebtoken";
-
-// import session from "express-session";
-// app.set("trust proxy", 1); // trust first proxy
-// app.use(
-//   session({
-//     secret: secret,
-//     resave: false,
-//     saveUninitialized: true,
-//     cookie: { secure: true },
-//   })
-// );
 
 app.set("view engine", "ejs");
 
@@ -95,11 +84,35 @@ app.get("/auth_reidrect", (req, res) => {
 });
 
 app.get("/chef", (req, res) => {
-    res.send("This is the chef portal");
+    res.render("chef.ejs");
 })
 
 app.get("/customer", (req, res) => {
-  res.send("This is the customer portal");
+  res.render("customer.ejs");
+});
+
+app.get("/menu", async (req, res) => {
+  const starters = await get_food_menu(1);
+  const main_course = await get_food_menu(2);
+  const dessert = await get_food_menu(3);
+  console.log(starters);
+  console.log(main_course);
+  console.log(dessert);
+  res.render("menu.ejs" , {starters,main_course,dessert});
+})
+
+app.post("/food_items_added", async (req, res) => {
+  const quant = req.body;
+  // 1. Add the data into the order table to generate order id
+  // 2. Then you now have the food id and the order id so now add all the food items into the ordered items table
+  const token = req.cookies.token;
+  console.log("token in auth redirect = " + token);
+  const payload = jwt.verify(token, secret);
+  const customer_id = await find_customer_id(payload.email);
+  const chef_id = await chef_id_free();
+  console.log("IN index.js = " + chef_id);
+  await add_order_table(customer_id, "left", chef_id)
+  res.send("Data has been added successfully inside the order table");
 });
 
 app.listen(port, (err) => {
