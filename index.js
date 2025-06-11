@@ -111,8 +111,16 @@ app.post("/food_items_added", async (req, res) => {
   const customer_id = await find_customer_id(payload.email);
   const chef_id = await chef_id_free();
   console.log("IN index.js = " + chef_id);
-  await add_order_table(customer_id, "left", chef_id)
-  res.send("Data has been added successfully inside the order table");
+  if (chef_id == -1) {
+    res.status(400).json({
+      success: false,
+      message: "No chef is available at this moment"
+    });
+  }
+  else {
+    await add_order_table(customer_id, "left", chef_id);
+    res.send("Data has been added successfully inside the order table");
+  }
 });
 
 app.listen(port, (err) => {

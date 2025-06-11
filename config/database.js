@@ -80,17 +80,18 @@ export const find_chef_id = async () => {
 export const find_chef_free = async (chef_id) => {
     const [data] = await db.query(`SELECT * FROM order_table WHERE chef_id = (?);`, [chef_id]);
     console.log("Found the data");
-    data.forEach((chef_row) => {
+    let chef;
+    for(const chef_row of data){
         console.log("Inside the data loop")
         if (chef_row.food_status == "completed") {
-            return chef_row.chef_id;
+            chef = chef_row.chef_id;
         }
         else {
-            return -1;
+            chef = -1;
         }
-    })
+    }
   // console.log(data);
-  return data;
+  return chef;
 };
 
 export const chef_id_free = async() => {
@@ -117,6 +118,7 @@ export const chef_id_free = async() => {
             }
             else {
                 console.log(`${chef.user_id} is not free so finding a new one`);
+                chef_id =  0;
             }
         }
     }
@@ -128,5 +130,6 @@ export const chef_id_free = async() => {
     else {
         console.log(chef_id + "Outside the for loop");
         console.log("No chef is free at this moment");
+        return -1;
     }
 }
