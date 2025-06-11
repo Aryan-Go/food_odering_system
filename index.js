@@ -34,11 +34,18 @@ app.get("/signup", (req, res) => {
 })
 
 app.post("/signup_add", async (req, res) => {
-    //   res.send(req.body);
-    const { username, email, password, role } = req.body;
+  const { username, email, password, role } = req.body;
+  try {
     const hash = await bcrypt.hash(password, 10);
     add_data(username, role, hash, email);
     res.redirect("/login");
+    
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "Some problem in signing up please try again after some time"
+    })
+  }
 });
 
 app.get("/login", (req, res) => {
@@ -47,22 +54,24 @@ app.get("/login", (req, res) => {
 
 app.post("/login_add", async (req, res) => {
     const { email, password } = req.body;
-    const payload = {
+    try {
+      const payload = {
         email: email,
         role: await find_role(email),
-    }
-    if (await check_email(email)) {
-      const token = await jwt.sign(payload, secret, { expiresIn: 2 * 60 * 60 });
-      console.log(token);
-      res.cookie("token", token);
-      res.redirect("/auth_reidrect")
-    }
-    else {
-        res.status(400).json({
-            success: false,
-            message: "User is not signed in",
-        });
-    }
+      }
+      if (await check_email(email)) {
+        const token = await jwt.sign(payload, secret, { expiresIn: 2 * 60 * 60 });
+        console.log(token);
+        res.cookie("token", token);
+        res.redirect("/auth_reidrect")
+      }
+      
+    } catch (error) {
+      res.json({
+        success: false,
+        message: "Some problem in verifying the user. If not signed up then please do once"
+      });
+      }
 });
 
 app.get("/auth_reidrect", (req, res) => {
@@ -83,15 +92,65 @@ app.get("/auth_reidrect", (req, res) => {
   }
 });
 
-app.get("/chef", (req, res) => {
+const auth_checker = async (req, res, next) => {
+  try {
+    const token = req.cookies.token;
+    console.log("token in auth redirect = " + token);
+    const payload = jwt.verify(token, secret);
+    console.log(payload);
+    req.user = payload;
+    next();
+  } catch (error) {
+    res.json({
+      success: false,
+      message: "You are not authorised. Please login once more"
+    });
+  }
+}
+
+const customer_home = async (req, res, next) => {
+  if (req.user.role == "customer") {
+    next();
+  }
+  else {
+    res.json({
+      success: false,
+      message: "You are not authorised to enter as this is a protected route",
+    });
+  }
+}
+
+const customer_menu = async (req, res, next) => {
+  if (req.user.role == "customer") {
+    next();
+  } else {
+    res.json({
+      success: false,
+      message: "You are not authorised to enter as this is a protected route",
+    });
+  }
+};
+
+const chef_home = async (req, res, next) => {
+  if (req.user.role == "chef") {
+    next();
+  } else {
+    res.json({
+      success: false,
+      message: "You are not authorised to enter as this is a protected route",
+    });
+  }
+};
+
+app.get("/chef", auth_checker, chef_home ,(req, res) => {
     res.render("chef.ejs");
 })
 
-app.get("/customer", (req, res) => {
+app.get("/customer", auth_checker, customer_home ,(req, res) => {
   res.render("customer.ejs");
 });
 
-app.get("/menu", async (req, res) => {
+app.get("/menu", auth_checker, customer_menu, async (req, res) => {
   const starters = await get_food_menu(1);
   const main_course = await get_food_menu(2);
   const dessert = await get_food_menu(3);
