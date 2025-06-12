@@ -40,6 +40,7 @@
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Quanity</label><br>
                                 <input type="number" value=0 name="quant"  min="0" class="quant w-[5rem] text-center border-dashed border-black">
+                                <input type="number" value="<%= starter.food_id %>" name="food_id" class="food_id" hidden>
                             </td>
                         </tr>
                     <% }); %>
@@ -66,6 +67,7 @@
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Quanity</label>
                                 <input type="number" value=0 name="quant" min="0" class="quant w-[5rem] text-center border-dashed border-black">
+                                <input type="number" value="<%= main.food_id %>" name="food_id" class="food_id" hidden>
                             </td>
                         </tr>
                     <% }); %>
@@ -92,6 +94,7 @@
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Quanity</label>
                                 <input type="number" value=0 name="quant" min="0" class="quant w-[5rem] text-center border-dashed border-black">
+                                <input type="number" value= "<%= dess.food_id %>"name="food_id" class="food_id" hidden>
                             </td>
                         </tr>
                     <% }); %>

@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free } from "./config/database.js";
+import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items } from "./config/database.js";
 
 import jwt from "jsonwebtoken";
 
@@ -141,6 +141,26 @@ const chef_home = async (req, res, next) => {
     });
   }
 };
+const chef_order = async (req, res, next) => {
+  if (req.user.role == "chef") {
+    next();
+  } else {
+    res.json({
+      success: false,
+      message: "You are not authorised to enter as this is a protected route",
+    });
+  }
+};
+const chef_complete_item = async (req, res, next) => {
+  if (req.user.role == "chef") {
+    next();
+  } else {
+    res.json({
+      success: false,
+      message: "You are not authorised to enter as this is a protected route",
+    });
+  }
+};
 
 app.get("/chef", auth_checker, chef_home ,(req, res) => {
     res.render("chef.ejs");
@@ -161,7 +181,9 @@ app.get("/menu", auth_checker, customer_menu, async (req, res) => {
 })
 
 app.post("/food_items_added", async (req, res) => {
-  const quant = req.body;
+  const quant = req.body.quant;
+  const food_id = req.body.food_id;
+  // res.send(quant);
   // 1. Add the data into the order table to generate order id
   // 2. Then you now have the food id and the order id so now add all the food items into the ordered items table
   const token = req.cookies.token;
@@ -178,9 +200,40 @@ app.post("/food_items_added", async (req, res) => {
   }
   else {
     await add_order_table(customer_id, "left", chef_id);
-    res.send("Data has been added successfully inside the order table");
+    console.log("Data has been added successfully inside the order table");
+    quant.forEach(async (item, index) => {
+      if (item != 0) {
+        const order_id = await find_order_id(customer_id, chef_id);
+        await add_ordered_items(food_id[index], item, "jkdkhfkjsh", order_id);
+        res.render("Just wait for the waiting page");
+      }
+      else {
+        console.log("It was a 0");
+      }
+    })
   }
 });
+
+app.get("/order", auth_checker, chef_order, async (req, res) => {
+  const token = req.cookies.token;
+  const payload = jwt.verify(token, secret);
+  const email = payload.email;
+  // console.log(email);
+  const chef_data = await find_chef_id(email)
+  console.log(chef_data[0].user_id);
+  const order_id = await find_chef_orders(chef_data[0].user_id);
+  console.log(order_id);
+  const data = await get_ordered_items(order_id);
+  console.log(data);
+  res.render("order.ejs", { data });
+})
+
+app.post("/complete_item",auth_checker,chef_complete_item ,async (req, res) => {
+  // res.send(req.body);
+  await complete_ordered_items(req.body.order_id, req.body.food_id, req.body.completed);
+  console.log("This id has been turned to completed");
+  res.redirect("/order");
+})
 
 app.listen(port, (err) => {
     if (err) {

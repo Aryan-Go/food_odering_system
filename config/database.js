@@ -45,6 +45,8 @@ export const find_customer_id = async (email) => {
   // console.log(data);
   return data[0].user_id;
 };
+
+
 //ADMIN CONTROL OVER THE FOOD MENU
 export const add_menu_items = async (food_name, description, price, category_id) => {
     await dq.query(`INSERT INTO food_menu (food_name,description,price,category_id) VALUES (? , ?,?,?);`, [food_name, description, price, category_id]);
@@ -70,9 +72,8 @@ export const add_order_table = async (
 };
 
 
-export const find_chef_id = async () => {
-    const r = "chef";
-    const [data] = await db.query(`SELECT * FROM user WHERE role = (?);` , [r]);
+export const find_chef_id = async (email) => {
+    const [data] = await db.query(`SELECT * FROM user WHERE email = ?;` , [email]);
     // console.log(data);
     return data;
 };
@@ -133,3 +134,43 @@ export const chef_id_free = async() => {
         return -1;
     }
 }
+
+export const add_ordered_items = async (food_id,quantity,special_instructions,order_id) => {
+    const food_status = "left";
+    await db.query(`INSERT INTO ordered_items VALUES (?,?,?,?,?)`, [food_id, quantity, special_instructions, order_id, food_status]);
+    console.log("Data has been successfully added in the ordered items table");
+}
+
+export const find_order_id = async (customer_id, chef_id) => {
+    const food_status = "left";
+    const [data] = await db.query(`SELECT * FROM order_table WHERE customer_id = (?) AND chef_id = (?) AND food_status = (?)`, [customer_id, chef_id, food_status]);
+    return data[0].order_id;
+}
+
+export const find_chef_orders = async (chef_id) => {
+    console.log("I am in find_chef_orders");
+    const food_status = "left";
+    const [data] = await db.query(
+      `SELECT * FROM order_table WHERE chef_id = ? AND food_status = ?`,
+      [chef_id, food_status]
+    );
+    console.log(data[0].order_id);
+    
+    return data[0].order_id;
+}
+
+export const get_ordered_items = async (order_id) => {
+    const food_status = "left";
+    const [data] = await db.query(`SELECT * FROM ordered_items WHERE order_id = ? AND food_status = ?`, [order_id, food_status]);
+    console.log(data);
+    return data;
+}
+
+export const complete_ordered_items = async (order_id,food_id,food_status) => {
+  const [data] = await db.query(
+    `UPDATE ordered_items SET food_status = ? WHERE order_id = ? AND food_id = ?;`,
+    [food_status, order_id, food_id]
+  );
+  console.log(data);
+  return data;
+};
