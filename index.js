@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items } from "./config/database.js";
+import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items,status_order_id } from "./config/database.js";
 
 import jwt from "jsonwebtoken";
 
@@ -205,12 +205,12 @@ app.post("/food_items_added", async (req, res) => {
       if (item != 0) {
         const order_id = await find_order_id(customer_id, chef_id);
         await add_ordered_items(food_id[index], item, "jkdkhfkjsh", order_id);
-        res.render("Just wait for the waiting page");
       }
       else {
         console.log("It was a 0");
       }
     })
+    res.send("Just wait for the waiting page");
   }
 });
 
@@ -218,20 +218,27 @@ app.get("/order", auth_checker, chef_order, async (req, res) => {
   const token = req.cookies.token;
   const payload = jwt.verify(token, secret);
   const email = payload.email;
-  // console.log(email);
+  console.log(email);
   const chef_data = await find_chef_id(email)
   console.log(chef_data[0].user_id);
   const order_id = await find_chef_orders(chef_data[0].user_id);
   console.log(order_id);
-  const data = await get_ordered_items(order_id);
-  console.log(data);
+  let data;
+  if (order_id != -1) {
+    data = await get_ordered_items(order_id);
+    console.log(data);
+  }
+  else {
+    data = [];
+  }
+  // const check = await status_order_id(order_id);
   res.render("order.ejs", { data });
 })
 
 app.post("/complete_item",auth_checker,chef_complete_item ,async (req, res) => {
   // res.send(req.body);
   await complete_ordered_items(req.body.order_id, req.body.food_id, req.body.completed);
-  console.log("This id has been turned to completed");
+  console.log("This order id has been turned to completed in ordered table");
   res.redirect("/order");
 })
 

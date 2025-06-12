@@ -77,6 +77,12 @@ export const find_chef_id = async (email) => {
     // console.log(data);
     return data;
 };
+export const find_chef_id_2 = async () => {
+    const r = "chef";
+  const [data] = await db.query(`SELECT * FROM user WHERE role = ?;`, [r]);
+  // console.log(data);
+  return data;
+};
   
 export const find_chef_free = async (chef_id) => {
     const [data] = await db.query(`SELECT * FROM order_table WHERE chef_id = (?);`, [chef_id]);
@@ -100,7 +106,7 @@ export const chef_id_free = async() => {
     // 2. now check if the chef id is there in ordered_items or not
     // 3. If it is not there then return the chef id otherwise check if all the items have been completed or not
     // 4. If completed then return the chef id otherwise take a new chef id
-    const data = await find_chef_id();
+    const data = await find_chef_id_2();
     console.log("Data has been acquired from the function find_chef_id");
     console.log(data);
     let chef_id;
@@ -154,9 +160,16 @@ export const find_chef_orders = async (chef_id) => {
       `SELECT * FROM order_table WHERE chef_id = ? AND food_status = ?`,
       [chef_id, food_status]
     );
-    console.log(data[0].order_id);
-    
-    return data[0].order_id;
+
+    if (data.length != 0) {
+        console.log(data);
+        console.log(data[0].order_id);
+        
+        return data[0].order_id;
+    }
+    else {
+        return -1;
+    }
 }
 
 export const get_ordered_items = async (order_id) => {
@@ -171,6 +184,47 @@ export const complete_ordered_items = async (order_id,food_id,food_status) => {
     `UPDATE ordered_items SET food_status = ? WHERE order_id = ? AND food_id = ?;`,
     [food_status, order_id, food_id]
   );
+    const check = await status_order_id(order_id);
   console.log(data);
   return data;
 };
+
+export const status_order_id = async (order_id) => {
+    const [data] = await db.query(`SELECT * FROM ordered_items where order_id = ?`, [order_id]);
+    // console.log(data);
+    for(const data_row in data){
+        if (data_row.food_status == "left") {
+            console.log("Chef is busy based on ordered item");
+            return -1;
+        }
+    }
+    const food_status = "completed";
+    await db.query(
+      `UPDATE order_table SET food_status = ? WHERE order_id = ? `,[food_status,order_id]
+    );
+    console.log("Data has been updated in the order_table");
+    return 0;
+}
+const status_chef = async (chef_id) => {
+    const [data] = db.query(`SELCT * FROM order_table where chef_id = ?`, [chef_id]);
+    for (const data_row in data) {
+        if (await data_row.food_status == "left") {
+            console.log("Chef is busy based on order table")
+            return -1;
+        }
+    }
+    console.log("Chef is free based on order table")
+    return chef_id;
+}
+
+// export const complete_order_table = async (
+//   order_id,
+//   chef_id
+// ) => {
+//     const food_status = "completed";
+//   const [data] = await db.query(
+//     `UPDATE ordered_items SET food_status = ? WHERE order_id = ? AND chef_id = ?;`,
+//     [food_status,order_id, chef_id]
+//   );
+    
+// };
