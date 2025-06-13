@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items,status_order_id,get_order_chef_id,total_payment,add_payment_table,get_payment_table } from "./config/database.js";
+import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items,status_order_id,get_order_chef_id,total_payment,add_payment_table,get_payment_table,update_payment_table,get_payment_id } from "./config/database.js";
 
 import jwt from "jsonwebtoken";
 
@@ -234,7 +234,8 @@ app.get("/waiting_page", async (req, res) => {
     const data = await get_ordered_items(num_order_id);
     console.log(data)
     if (data.length > 0) {
-      res.render("waiting_page.ejs", { data });
+      console.log("Just before render = " + num_order_id);
+      res.render("waiting_page.ejs", { data ,num_order_id});
     }
     else {
       const token = req.cookies.token;
@@ -243,12 +244,13 @@ app.get("/waiting_page", async (req, res) => {
       const customer_id = await find_customer_id(payload.email);
       console.log(customer_id);
       const { order_id } = req.query;
-      res.redirect(`/payment?order_id=${order_id}`);
+      const num_order_id = parseInt(order_id);
+      res.redirect(`/payment?order_id=${num_order_id}`);
     }
   } catch (error) {
     res.json({
       success: false,
-      message: `Your oder hasn't been placed yet please reorder`
+      message: error
     })
   }
 });
@@ -265,8 +267,35 @@ app.get("/payment", async (req, res) => {
   // 1. Firstly make functions to add and subtract sum of money that is required to make give the total d-print-table-cell - done
   // 2. Now make 2 functions to insert data inside the databse and get the data
   // 3. bring it to an ejs file
-  const data = get_payment_table(order_id, customer_id);
-  res.render("payment.ejs", { data });
+  const data = await get_payment_table(customer_id);
+  console.log("The data for payment is = " + data);
+  res.render("payment.ejs", { data,customer_id });
+})
+
+app.post("/payment_done", async (req, res) => {
+  try {
+    const num_order_id = req.body.order_id;
+    console.log(num_order_id);
+    console.log("Total = " + req.body.total);
+    const total = parseInt(req.body.total) + parseInt((req.body.tip / 100) * req.body.total);
+    const token = req.cookies.token;
+    console.log("token in auth redirect = " + token);
+    const payload = jwt.verify(token, secret);
+    const customer_id = await find_customer_id(payload.email);
+    const payment_id = await get_payment_id(customer_id, num_order_id)
+    console.log(payment_id);
+    await update_payment_table(customer_id,payment_id[0].payment_id);
+    res.json({
+      success: true,
+      message: "The total amount paid is = " + total
+    });
+    
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error
+    })
+  }
 })
 
 app.get("/order", auth_checker, chef_order, async (req, res) => {

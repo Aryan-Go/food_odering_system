@@ -247,14 +247,32 @@ export const add_payment_table = async (total_price,order_id, customer_id) => {
     console.log("Data has been added in the payments table");
 }
 
-export const get_payment_table = async (order_id,customer_id) => {
-  const payment_status = "left";
+export const get_payment_table = async (customer_id) => {
+    const payment_status = "left";
+    
   const [data] = await db.query(
-    `SELECT * FROM payment_table WHERE order_id = ? AND customer_id = ?`,
-    [order_id,customer_id]
+    `SELECT * FROM payment_table WHERE customer_id = ? AND payment_status = ?`,
+    [customer_id,payment_status]
   );
     return data;
 //   console.log("Data has been added in the payments table");
+};
+
+export const get_payment_id = async (customer_id, order_id) => {
+    const [data] = await db.query(`SELECT * FROM payment_table WHERE customer_id = ? AND order_id = ?`, [customer_id, order_id]);
+    return data
+}
+
+export const update_payment_table = async (customer_id,payment_id) => {
+  const payment_status_2 = "completed";
+  const payment_status_1 = "left";
+
+    await db.query(
+    `UPDATE payment_table SET payment_status = ? WHERE customer_id = ? AND payment_status = ? AND payment_id = ?`,
+    [payment_status_2,customer_id, payment_status_1,payment_id]
+  );
+    console.log("Data has been successfully updates for payment table");
+  //   console.log("Data has been added in the payments table");
 };
 // export const complete_order_table = async (
 //   order_id,
