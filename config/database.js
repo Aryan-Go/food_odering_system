@@ -110,25 +110,32 @@ export const chef_id_free = async() => {
     console.log("Data has been acquired from the function find_chef_id");
     console.log(data);
     let chef_id;
-    for(const chef of data){
-        console.log("Inisde the data loop in chef_id_free");
-        const [number] = await db.query(`SELECT COUNT(*) AS count FROM order_table WHERE chef_id = (?)`, [chef.user_id]);
-        console.log(number);
-        if (number[0].count == 0) {
+    if (data.length > 0) {
+        for (const chef of data) {
+          console.log("Inisde the data loop in chef_id_free");
+          const [number] = await db.query(
+            `SELECT COUNT(*) AS count FROM order_table WHERE chef_id = (?)`,
+            [chef.user_id]
+          );
+          console.log(number);
+          if (number[0].count == 0) {
             console.log(chef.user_id);
             chef_id = chef.user_id;
-        }
-        else {
+          } else {
             const check = await find_chef_free(chef.user_id);
             if (check !== -1) {
-                chef_id = check;
+              chef_id = check;
+            } else {
+              console.log(`${chef.user_id} is not free so finding a new one`);
+              chef_id = 0;
             }
-            else {
-                console.log(`${chef.user_id} is not free so finding a new one`);
-                chef_id =  0;
-            }
+          }
         }
     }
+    else {
+        chef_id = -1;
+    }
+    
     if (chef_id != 0) {
         console.log("I am returning value right now");
         console.log("Here chef id is = " + chef_id);
