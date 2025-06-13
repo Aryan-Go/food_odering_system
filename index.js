@@ -10,6 +10,8 @@ import dotenv from "dotenv";
 dotenv.config();
 const port = process.env.port
 const secret = process.env.secret;
+const admin_email = process.env.admin_email;
+const admin_password = process.env.admin_password;
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -53,17 +55,26 @@ app.get("/login", (req, res) => {
 });
 
 app.post("/login_add", async (req, res) => {
-    const { email, password } = req.body;
+  const { email, password } = req.body;
+  console.log(admin_email);
+  console.log(email);
+  console.log(password);
+  console.log(admin_password);
     try {
-      const payload = {
-        email: email,
-        role: await find_role(email),
+      if (email == admin_email && password == admin_password) {
+        res.redirect("/admin");
       }
-      if (await check_email(email)) {
-        const token = await jwt.sign(payload, secret, { expiresIn: 2 * 60 * 60 });
-        console.log(token);
-        res.cookie("token", token);
-        res.redirect("/auth_reidrect")
+      else {
+        const payload = {
+          email: email,
+          role: await find_role(email),
+        }
+        if (await check_email(email)) {
+          const token = await jwt.sign(payload, secret, { expiresIn: 2 * 60 * 60 });
+          console.log(token);
+          res.cookie("token", token);
+          res.redirect("/auth_reidrect")
+        }
       }
       
     } catch (error) {
@@ -91,7 +102,9 @@ app.get("/auth_reidrect", async (req, res) => {
     else {
       res.redirect("/customer");
     }
-  } else {
+  }
+    
+  else {
     res.status(500).json({
       success: false,
       message: "Some error with authentication",
@@ -114,7 +127,9 @@ const auth_checker = async (req, res, next) => {
     });
   }
 }
-
+app.get("/admin", (req, res) => {
+  res.send("This is the admin side");
+})
 const customer_home = async (req, res, next) => {
   if (req.user.role == "customer") {
     next();
