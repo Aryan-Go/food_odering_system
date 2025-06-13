@@ -190,12 +190,15 @@ export const complete_ordered_items = async (order_id,food_id,food_status) => {
 };
 
 export const status_order_id = async (order_id) => {
-    const [data] = await db.query(`SELECT * FROM ordered_items where order_id = ?`, [order_id]);
+    const [data] = await db.query(`SELECT * FROM ordered_items WHERE order_id = ?`, [order_id]);
     // console.log(data);
-    for(const data_row in data){
+    for(const data_row of data){
         if (data_row.food_status == "left") {
             console.log("Chef is busy based on ordered item");
-            return -1;
+            return data;
+        }
+        else {
+            console.log("This item has been completed by chef");
         }
     }
     const food_status = "completed";

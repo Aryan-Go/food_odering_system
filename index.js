@@ -227,11 +227,11 @@ app.get("/order", auth_checker, chef_order, async (req, res) => {
   if (order_id != -1) {
     data = await get_ordered_items(order_id);
     console.log(data);
+    const check = await status_order_id(order_id);
   }
   else {
     data = [];
   }
-  // const check = await status_order_id(order_id);
   res.render("order.ejs", { data });
 })
 
