@@ -269,7 +269,14 @@ export const get_payment_id = async (customer_id, order_id) => {
     const [data] = await db.query(`SELECT * FROM payment_table WHERE customer_id = ? AND order_id = ?`, [customer_id, order_id]);
     return data
 }
-
+export const get_payment_status = async (customer_id) => {
+    const payment_status = "left";
+  const [data] = await db.query(
+    `SELECT * FROM payment_table WHERE customer_id = ? and payment_status = ?`,
+    [customer_id, payment_status]
+  );
+  return data;
+};
 export const update_payment_table = async (customer_id,payment_id) => {
   const payment_status_2 = "completed";
   const payment_status_1 = "left";

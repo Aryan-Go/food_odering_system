@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items,status_order_id,get_order_chef_id,total_payment,add_payment_table,get_payment_table,update_payment_table,get_payment_id } from "./config/database.js";
+import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items,status_order_id,get_order_chef_id,total_payment,add_payment_table,get_payment_table,update_payment_table,get_payment_id,get_payment_status } from "./config/database.js";
 
 import jwt from "jsonwebtoken";
 
@@ -74,7 +74,7 @@ app.post("/login_add", async (req, res) => {
       }
 });
 
-app.get("/auth_reidrect", (req, res) => {
+app.get("/auth_reidrect", async (req, res) => {
   console.log("I am in");
     const token = req.cookies.token;
     console.log("token in auth redirect = " + token)
@@ -83,7 +83,14 @@ app.get("/auth_reidrect", (req, res) => {
   if (payload.role == "chef") {
     res.redirect("/chef");
   } else if (payload.role == "customer") {
-    res.redirect("/customer");
+    const customer_id = await find_customer_id(payload.email);
+    const payment_status = await get_payment_status(customer_id);
+    if (payment_status.length > 0) {
+      res.redirect("/payment");
+    }
+    else {
+      res.redirect("/customer");
+    }
   } else {
     res.status(500).json({
       success: false,
@@ -115,7 +122,8 @@ const customer_home = async (req, res, next) => {
   else {
     res.json({
       success: false,
-      message: "You are not authorised to enter as this is a protected route",
+      message:
+        "You are not authorised to enter as this is a protected route and your are logged in as chef",
     });
   }
 }
@@ -126,7 +134,8 @@ const customer_menu = async (req, res, next) => {
   } else {
     res.json({
       success: false,
-      message: "You are not authorised to enter as this is a protected route",
+      message:
+        "You are not authorised to enter as this is a protected route and your are logged in as chef",
     });
   }
 };
@@ -137,7 +146,7 @@ const chef_home = async (req, res, next) => {
   } else {
     res.json({
       success: false,
-      message: "You are not authorised to enter as this is a protected route",
+      message: "You are not authorised to enter as this is a protected route and your are logged in as customer",
     });
   }
 };
@@ -147,7 +156,8 @@ const chef_order = async (req, res, next) => {
   } else {
     res.json({
       success: false,
-      message: "You are not authorised to enter as this is a protected route",
+      message:
+        "You are not authorised to enter as this is a protected route and your are logged in as customer",
     });
   }
 };
@@ -157,7 +167,8 @@ const chef_complete_item = async (req, res, next) => {
   } else {
     res.json({
       success: false,
-      message: "You are not authorised to enter as this is a protected route",
+      message:
+        "You are not authorised to enter as this is a protected route and your are logged in as customer",
     });
   }
 };
@@ -255,7 +266,7 @@ app.get("/waiting_page", async (req, res) => {
   }
 });
 
-app.get("/payment", async (req, res) => {
+app.get("/payment",auth_checker,customer_home ,async (req, res) => {
   const { order_id } = req.query;
   const num_order_id = parseInt(order_id);
   console.log(num_order_id);
@@ -272,7 +283,7 @@ app.get("/payment", async (req, res) => {
   res.render("payment.ejs", { data,customer_id });
 })
 
-app.post("/payment_done", async (req, res) => {
+app.post("/payment_done",auth_checker,customer_home,async (req, res) => {
   try {
     const num_order_id = req.body.order_id;
     console.log(num_order_id);
