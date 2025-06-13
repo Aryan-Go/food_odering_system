@@ -19,7 +19,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items,status_order_id } from "./config/database.js";
+import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items,status_order_id,get_order_chef_id,total_payment,add_payment_table,get_payment_table } from "./config/database.js";
 
 import jwt from "jsonwebtoken";
 
@@ -182,7 +182,11 @@ app.get("/menu", auth_checker, customer_menu, async (req, res) => {
 
 app.post("/food_items_added", async (req, res) => {
   const quant = req.body.quant;
+  console.log(quant);
   const food_id = req.body.food_id;
+  console.log(food_id);
+  const total_price = await total_payment(quant, food_id);
+  console.log("The total price that I am getting = " + total_price );
   // res.send(quant);
   // 1. Add the data into the order table to generate order id
   // 2. Then you now have the food id and the order id so now add all the food items into the ordered items table
@@ -201,18 +205,69 @@ app.post("/food_items_added", async (req, res) => {
   else {
     await add_order_table(customer_id, "left", chef_id);
     console.log("Data has been added successfully inside the order table");
-    quant.forEach(async (item, index) => {
-      if (item != 0) {
-        const order_id = await find_order_id(customer_id, chef_id);
-        await add_ordered_items(food_id[index], item, "jkdkhfkjsh", order_id);
+    let order_id;
+    for (let i = 0; i < quant.length ; i++){
+      if (quant[i] != 0) {
+        order_id = await find_order_id(customer_id, chef_id);
+        console.log(order_id);
+        await add_ordered_items(food_id[i], quant[i], "jkdkhfkjsh", order_id);
       }
       else {
         console.log("It was a 0");
       }
-    })
-    res.send("Just wait for the waiting page");
+    }
+    await add_payment_table(total_price, order_id, customer_id);
+    res.redirect(`/waiting_page?order_id=${order_id}`)
   }
 });
+
+app.get("/waiting_page", async (req, res) => {
+  try {
+    const token = req.cookies.token;
+    console.log("token in auth redirect = " + token);
+    const payload = jwt.verify(token, secret);
+    const customer_id = await find_customer_id(payload.email);
+    console.log(customer_id);
+    const {order_id} = req.query;
+    const num_order_id = parseInt(order_id);
+    console.log(num_order_id);
+    const data = await get_ordered_items(num_order_id);
+    console.log(data)
+    if (data.length > 0) {
+      res.render("waiting_page.ejs", { data });
+    }
+    else {
+      const token = req.cookies.token;
+      console.log("token in auth redirect = " + token);
+      const payload = jwt.verify(token, secret);
+      const customer_id = await find_customer_id(payload.email);
+      console.log(customer_id);
+      const { order_id } = req.query;
+      res.redirect(`/payment?order_id=${order_id}`);
+    }
+  } catch (error) {
+    res.json({
+      success: false,
+      message: `Your oder hasn't been placed yet please reorder`
+    })
+  }
+});
+
+app.get("/payment", async (req, res) => {
+  const { order_id } = req.query;
+  const num_order_id = parseInt(order_id);
+  console.log(num_order_id);
+  const token = req.cookies.token;
+  console.log("token in auth redirect = " + token);
+  const payload = jwt.verify(token, secret);
+  const customer_id = await find_customer_id(payload.email);
+  console.log(customer_id);
+  // 1. Firstly make functions to add and subtract sum of money that is required to make give the total d-print-table-cell - done
+  // 2. Now make 2 functions to insert data inside the databse and get the data
+  // 3. bring it to an ejs file
+  const data = get_payment_table(order_id, customer_id);
+  res.render("payment.ejs", { data });
+})
 
 app.get("/order", auth_checker, chef_order, async (req, res) => {
   const token = req.cookies.token;

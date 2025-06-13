@@ -219,7 +219,43 @@ const status_chef = async (chef_id) => {
     console.log("Chef is free based on order table")
     return chef_id;
 }
+export const get_order_chef_id = async (customer_id) => {
+    console.log("I am inside get_chef_order_id");
+    const food_status = "left";
+    const [data] = await db.query(`SELECT * FROM order_table WHERE customer_id = ? AND food_status = ?`, [customer_id, food_status]);
+    console.log(data);
+    return data;
+}
 
+export const total_payment = async (quant, food_id) => {
+    let total_price = 0;
+    for (let i = 0; i < quant.length ; i++) {
+        const [data_row] = await db.query(`SELECT * FROM food_menu WHERE food_id = ?`, [food_id[i]]);
+        console.log("This the price = "+data_row[0].price);
+        total_price = total_price + (quant[i] * data_row[0].price);
+        console.log(total_price);
+    }
+    return total_price;
+}
+
+export const add_payment_table = async (total_price,order_id, customer_id) => {
+    const payment_status = "left";
+    await db.query(
+      `INSERT INTO payment_table (total_price,payment_status,order_id,customer_id) VALUES (?,?,?,?)`,
+      [total_price, payment_status, order_id, customer_id]
+    );
+    console.log("Data has been added in the payments table");
+}
+
+export const get_payment_table = async (order_id,customer_id) => {
+  const payment_status = "left";
+  const [data] = await db.query(
+    `SELECT * FROM payment_table WHERE order_id = ? AND customer_id = ?`,
+    [order_id,customer_id]
+  );
+    return data;
+//   console.log("Data has been added in the payments table");
+};
 // export const complete_order_table = async (
 //   order_id,
 //   chef_id
