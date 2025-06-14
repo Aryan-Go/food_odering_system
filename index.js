@@ -61,10 +61,6 @@ app.post("/login_add", async (req, res) => {
   console.log(password);
   console.log(admin_password);
     try {
-      if (email == admin_email && password == admin_password) {
-        res.redirect("/admin");
-      }
-      else {
         const payload = {
           email: email,
           role: await find_role(email),
@@ -75,7 +71,6 @@ app.post("/login_add", async (req, res) => {
           res.cookie("token", token);
           res.redirect("/auth_reidrect")
         }
-      }
       
     } catch (error) {
       res.json({
@@ -103,6 +98,9 @@ app.get("/auth_reidrect", async (req, res) => {
       res.redirect("/customer");
     }
   }
+  else if (payload.role == "admin") {
+    res.redirect("/admin");
+    }
     
   else {
     res.status(500).json({
@@ -128,13 +126,17 @@ const auth_checker = async (req, res, next) => {
   }
 }
 app.get("/admin", (req, res) => {
-  res.send("This is the admin side");
+  res.render("admin.ejs");
 })
+app.post("/admin_working", (req, res) => {
+  const order_id= req.body.order_id;
+  res.redirect(`/order?order_id=${order_id}`);
+})
+
 const customer_home = async (req, res, next) => {
-  if (req.user.role == "customer") {
+  if (req.user.role == "customer" || req.user.role == "admin") {
     next();
-  }
-  else {
+  } else {
     res.json({
       success: false,
       message:
@@ -144,7 +146,7 @@ const customer_home = async (req, res, next) => {
 }
 
 const customer_menu = async (req, res, next) => {
-  if (req.user.role == "customer") {
+  if (req.user.role == "customer" || req.user.role == "admin") {
     next();
   } else {
     res.json({
@@ -156,17 +158,18 @@ const customer_menu = async (req, res, next) => {
 };
 
 const chef_home = async (req, res, next) => {
-  if (req.user.role == "chef") {
+  if (req.user.role == "chef" || req.user.role == "admin") {
     next();
   } else {
     res.json({
       success: false,
-      message: "You are not authorised to enter as this is a protected route and your are logged in as customer",
+      message:
+        "You are not authorised to enter as this is a protected route and your are logged in as customer",
     });
   }
 };
 const chef_order = async (req, res, next) => {
-  if (req.user.role == "chef") {
+  if (req.user.role == "chef" || req.user.role == "admin") {
     next();
   } else {
     res.json({
@@ -177,7 +180,7 @@ const chef_order = async (req, res, next) => {
   }
 };
 const chef_complete_item = async (req, res, next) => {
-  if (req.user.role == "chef") {
+  if (req.user.role == "chef" || req.user.role == "admin") {
     next();
   } else {
     res.json({
@@ -325,24 +328,42 @@ app.post("/payment_done",auth_checker,customer_home,async (req, res) => {
 })
 
 app.get("/order", auth_checker, chef_order, async (req, res) => {
-  const token = req.cookies.token;
-  const payload = jwt.verify(token, secret);
-  const email = payload.email;
-  console.log(email);
-  const chef_data = await find_chef_id(email)
-  console.log(chef_data[0].user_id);
-  const order_id = await find_chef_orders(chef_data[0].user_id);
-  console.log(order_id);
-  let data;
-  if (order_id != -1) {
-    data = await get_ordered_items(order_id);
-    console.log(data);
+  if (req.query != undefined) {
+    const order_id = req.query.order_id;
+    console.log(order_id);
+      const data = await get_ordered_items(order_id);
+      console.log(data);
     const check = await status_order_id(order_id);
+    if (data.length > 0) {
+      res.render("order.ejs", { data });
+    }
+    else {
+      res.json({
+        success: false,
+        message: "Either the order is completed or there is no such order id please check once"
+      })
+    }
   }
   else {
-    data = [];
+    const token = req.cookies.token;
+    const payload = jwt.verify(token, secret);
+    const email = payload.email;
+    console.log(email);
+    const chef_data = await find_chef_id(email)
+    console.log(chef_data[0].user_id);
+    const order_id = await find_chef_orders(chef_data[0].user_id);
+    console.log(order_id);
+    let data;
+    if (order_id != -1) {
+      data = await get_ordered_items(order_id);
+      console.log(data);
+      const check = await status_order_id(order_id);
+    }
+    else {
+      data = [];
+    }
+    res.render("order.ejs", { data });
   }
-  res.render("order.ejs", { data });
 })
 
 app.post("/complete_item",auth_checker,chef_complete_item ,async (req, res) => {

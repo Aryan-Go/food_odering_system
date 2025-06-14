@@ -23,7 +23,7 @@
             <table class="text-center w-[60vw] m-[4rem] px-[10rem]">
                 <thead>
                 <tr>
-                    <th scope="col" class="text-2xl mx-[2rem]">Food Items</th>
+                    <th scope="col" class="text-2xl mx-[2rem]">Food ID</th>
                     <th scope="col" class="text-2xl mx-[2rem]">Special Instructions</th>
                     <th scope="col" class="text-2xl mx-[2rem]">Quantity Added</th>
                     <th scope="col" class="text-2xl mx-[2rem]">Completed/left</th>
@@ -34,7 +34,7 @@
                         <tr>
                             <td class="text-xl font-bold mx-[2rem]"><%= food_item.food_id %></td>
                             <td class="text-xl font-semibold mx-[2rem]"><%= food_item.special_instructions %></td>
-                            <td class="text-xl font-bold mx-[2rem]">Rs<%= food_item.quantity %></td>
+                            <td class="text-xl font-bold mx-[2rem]"><%= food_item.quantity %></td>
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Check Complete or not</label><br>
                                 <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">

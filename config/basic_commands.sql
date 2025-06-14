@@ -5,8 +5,9 @@ CREATE TABLE user(
     email VARCHAR(200) NOT NULL ,
     username VARCHAR(300),
     password VARCHAR(200) NOT NULL,
-    role ENUM('chef','customer')
+    role ENUM('chef','customer','admin')
 );
+INSERT INTO user (email,username,password,role) VALUES("admin@gmail.com","admin","admin","admin");
 
 CREATE TABLE category(
     category_id INT PRIMARY KEY AUTO_INCREMENT,
