@@ -21,7 +21,30 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-import { add_data,check_email,find_role,get_food_menu,add_order_table,find_customer_id,chef_id_free,add_ordered_items,find_order_id,get_ordered_items,find_chef_orders,find_chef_id,complete_ordered_items,status_order_id,get_order_chef_id,total_payment,add_payment_table,get_payment_table,update_payment_table,get_payment_id,get_payment_status } from "./config/database.js";
+import {
+  add_data,
+  check_email,
+  find_role,
+  get_food_menu,
+  add_order_table,
+  find_customer_id,
+  chef_id_free,
+  add_ordered_items,
+  find_order_id,
+  get_ordered_items,
+  find_chef_orders,
+  find_chef_id,
+  complete_ordered_items,
+  status_order_id,
+  get_order_chef_id,
+  total_payment,
+  add_payment_table,
+  get_payment_table,
+  update_payment_table,
+  get_payment_id,
+  get_payment_status,
+  get_payment_table_2
+} from "./config/database.js";
 
 import jwt from "jsonwebtoken";
 
@@ -92,7 +115,7 @@ app.get("/auth_reidrect", async (req, res) => {
     const customer_id = await find_customer_id(payload.email);
     const payment_status = await get_payment_status(customer_id);
     if (payment_status.length > 0) {
-      res.redirect("/payment");
+      res.redirect(`/payment?customer_id=${customer_id}`);
     }
     else {
       res.redirect("/customer");
@@ -129,8 +152,15 @@ app.get("/admin", (req, res) => {
   res.render("admin.ejs");
 })
 app.post("/admin_working", (req, res) => {
-  const order_id= req.body.order_id;
-  res.redirect(`/order?order_id=${order_id}`);
+  const order_id = req.body.order_id;
+  const order_id_2 = req.body.order_id_2;
+  const customer_id = req.body.customer_id;
+  if (order_id != undefined) {
+    res.redirect(`/order?order_id=${order_id}`);
+  }
+  else if (order_id_2 != undefined) {
+    res.redirect(`/payment?order_id=${order_id_2}&customer_id=${customer_id}`);
+  }
 })
 
 const customer_home = async (req, res, next) => {
@@ -284,21 +314,30 @@ app.get("/waiting_page", async (req, res) => {
   }
 });
 
-app.get("/payment",auth_checker,customer_home ,async (req, res) => {
-  const { order_id } = req.query;
-  const num_order_id = parseInt(order_id);
-  console.log(num_order_id);
+app.get("/payment", auth_checker, customer_home, async (req, res) => {
   const token = req.cookies.token;
-  console.log("token in auth redirect = " + token);
   const payload = jwt.verify(token, secret);
-  const customer_id = await find_customer_id(payload.email);
-  console.log(customer_id);
-  // 1. Firstly make functions to add and subtract sum of money that is required to make give the total d-print-table-cell - done
-  // 2. Now make 2 functions to insert data inside the databse and get the data
-  // 3. bring it to an ejs file
-  const data = await get_payment_table(customer_id);
-  console.log("The data for payment is = " + data);
-  res.render("payment.ejs", { data,customer_id });
+  if (payload.role != "admin") {
+    console.log("I am not a admin");
+    const customer_id = req.query.customer_id;
+    const data = await get_payment_table(customer_id);
+    console.log("The data for payment is = " + data);
+    res.render("payment.ejs", { data, customer_id });
+  }
+  else {
+    const order_id = req.query.order_id;
+    console.log(order_id);
+    const num_order_id = parseInt(order_id);
+    console.log(num_order_id);
+    const customer_id = req.query.customer_id;
+    console.log(customer_id);
+    // 1. Firstly make functions to add and subtract sum of money that is required to make give the total d-print-table-cell - done
+    // 2. Now make 2 functions to insert data inside the databse and get the data
+    // 3. bring it to an ejs file
+    const data = await get_payment_table_2(num_order_id);
+    console.log("The data for payment is = " + data);
+    res.render("payment_admin.ejs", { data,customer_id }); 
+  }
 })
 
 app.post("/payment_done",auth_checker,customer_home,async (req, res) => {
@@ -311,6 +350,7 @@ app.post("/payment_done",auth_checker,customer_home,async (req, res) => {
     console.log("token in auth redirect = " + token);
     const payload = jwt.verify(token, secret);
     const customer_id = await find_customer_id(payload.email);
+    console.log(customer_id);
     const payment_id = await get_payment_id(customer_id, num_order_id)
     console.log(payment_id);
     await update_payment_table(customer_id,payment_id[0].payment_id);
@@ -327,8 +367,33 @@ app.post("/payment_done",auth_checker,customer_home,async (req, res) => {
   }
 })
 
+app.post("/payment_done_admin", auth_checker, customer_home, async (req, res) => {
+  try {
+    const num_order_id = req.body.order_id;
+    console.log(num_order_id);
+    console.log("Total = " + req.body.total);
+    const customer_id = req.body.customer_id;
+    console.log(customer_id);
+    const payment_id = await get_payment_id(customer_id, num_order_id);
+    console.log(payment_id);
+    await update_payment_table(customer_id, payment_id[0].payment_id);
+    res.json({
+      success: true,
+      message: "The payment is done now",
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      message: error,
+    });
+  }
+});
+
 app.get("/order", auth_checker, chef_order, async (req, res) => {
-  if (req.query != undefined) {
+  const token = req.cookies.token;
+  const payload = jwt.verify(token, secret);
+  // const email = payload.email;
+  if (payload.role == "admin") {
     const order_id = req.query.order_id;
     console.log(order_id);
       const data = await get_ordered_items(order_id);

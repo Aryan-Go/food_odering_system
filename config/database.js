@@ -265,6 +265,17 @@ export const get_payment_table = async (customer_id) => {
 //   console.log("Data has been added in the payments table");
 };
 
+export const get_payment_table_2 = async (order_id) => {
+  const payment_status = "left";
+
+  const [data] = await db.query(
+    `SELECT * FROM payment_table WHERE order_id = ? AND payment_status = ?`,
+    [order_id, payment_status]
+  );
+  return data;
+  //   console.log("Data has been added in the payments table");
+};
+
 export const get_payment_id = async (customer_id, order_id) => {
     const [data] = await db.query(`SELECT * FROM payment_table WHERE customer_id = ? AND order_id = ?`, [customer_id, order_id]);
     return data
