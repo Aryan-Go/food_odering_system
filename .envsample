@@ -1,0 +1,7 @@
+port=3000
+localhost=127.0.0.1
+user=root
+password=
+secret=
+admin_email=admin@gmail.com
+admin_password=admin
