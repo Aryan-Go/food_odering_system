@@ -148,20 +148,6 @@ const auth_checker = async (req, res, next) => {
     });
   }
 }
-app.get("/admin", (req, res) => {
-  res.render("admin.ejs");
-})
-app.post("/admin_working", (req, res) => {
-  const order_id = req.body.order_id;
-  const order_id_2 = req.body.order_id_2;
-  const customer_id = req.body.customer_id;
-  if (order_id != undefined) {
-    res.redirect(`/order?order_id=${order_id}`);
-  }
-  else if (order_id_2 != undefined) {
-    res.redirect(`/payment?order_id=${order_id_2}&customer_id=${customer_id}`);
-  }
-})
 
 const customer_home = async (req, res, next) => {
   if (req.user.role == "customer" || req.user.role == "admin") {
@@ -170,7 +156,7 @@ const customer_home = async (req, res, next) => {
     res.json({
       success: false,
       message:
-        "You are not authorised to enter as this is a protected route and your are logged in as chef",
+      "You are not authorised to enter as this is a protected route and your are logged in as chef",
     });
   }
 }
@@ -182,7 +168,19 @@ const customer_menu = async (req, res, next) => {
     res.json({
       success: false,
       message:
-        "You are not authorised to enter as this is a protected route and your are logged in as chef",
+      "You are not authorised to enter as this is a protected route and your are logged in as chef",
+    });
+  }
+};
+
+const admin = async (req, res, next) => {
+  if (req.user.role == "admin") {
+    next();
+  } else {
+    res.json({
+      success: false,
+      message:
+      "You are not authorised to enter as this is a protected route and your are logged in as admin",
     });
   }
 };
@@ -194,7 +192,7 @@ const chef_home = async (req, res, next) => {
     res.json({
       success: false,
       message:
-        "You are not authorised to enter as this is a protected route and your are logged in as customer",
+      "You are not authorised to enter as this is a protected route and your are logged in as customer",
     });
   }
 };
@@ -205,7 +203,7 @@ const chef_order = async (req, res, next) => {
     res.json({
       success: false,
       message:
-        "You are not authorised to enter as this is a protected route and your are logged in as customer",
+      "You are not authorised to enter as this is a protected route and your are logged in as customer",
     });
   }
 };
@@ -216,13 +214,27 @@ const chef_complete_item = async (req, res, next) => {
     res.json({
       success: false,
       message:
-        "You are not authorised to enter as this is a protected route and your are logged in as customer",
+      "You are not authorised to enter as this is a protected route and your are logged in as customer",
     });
   }
 };
+app.get("/admin",auth_checker,admin, (req, res) => {
+  res.render("admin.ejs");
+})
+app.post("/admin_working",auth_checker,admin, (req, res) => {
+  const order_id = req.body.order_id;
+  const order_id_2 = req.body.order_id_2;
+  const customer_id = req.body.customer_id;
+  if (order_id != undefined) {
+    res.redirect(`/order?order_id=${order_id}`);
+  }
+  else if (order_id_2 != undefined) {
+    res.redirect(`/payment?order_id=${order_id_2}&customer_id=${customer_id}`);
+  }
+})
 
 app.get("/chef", auth_checker, chef_home ,(req, res) => {
-    res.render("chef.ejs");
+  res.render("chef.ejs");
 })
 
 app.get("/customer", auth_checker, customer_home ,(req, res) => {
@@ -338,7 +350,15 @@ app.get("/payment", auth_checker, customer_home, async (req, res) => {
       // 3. bring it to an ejs file
       const data = await get_payment_table_2(num_order_id);
       console.log("The data for payment is = " + data);
-      res.render("payment_admin.ejs", { data,customer_id }); 
+      if (data.length > 0) {
+        res.render("payment_admin.ejs", { data,customer_id }); 
+      }
+      else {
+        res.json({
+          success: false,
+          message: "The order has already been paid or completed",
+        });
+      }
     } catch (error) {
       res.json({
         success: false,
