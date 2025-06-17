@@ -245,7 +245,8 @@ app.post("/food_items_added", async (req, res) => {
   const food_id = req.body.food_id;
   console.log(food_id);
   const total_price = await total_payment(quant, food_id);
-  console.log("The total price that I am getting = " + total_price );
+  console.log("The total price that I am getting = " + total_price);
+  const special_instructions = req.body.special_instructions;
   // res.send(quant);
   // 1. Add the data into the order table to generate order id
   // 2. Then you now have the food id and the order id so now add all the food items into the ordered items table
@@ -269,7 +270,7 @@ app.post("/food_items_added", async (req, res) => {
       if (quant[i] != 0) {
         order_id = await find_order_id(customer_id, chef_id);
         console.log(order_id);
-        await add_ordered_items(food_id[i], quant[i], "jkdkhfkjsh", order_id);
+        await add_ordered_items(food_id[i], quant[i], special_instructions[i], order_id);
       }
       else {
         console.log("It was a 0");
@@ -325,18 +326,25 @@ app.get("/payment", auth_checker, customer_home, async (req, res) => {
     res.render("payment.ejs", { data, customer_id });
   }
   else {
-    const order_id = req.query.order_id;
-    console.log(order_id);
-    const num_order_id = parseInt(order_id);
-    console.log(num_order_id);
-    const customer_id = req.query.customer_id;
-    console.log(customer_id);
-    // 1. Firstly make functions to add and subtract sum of money that is required to make give the total d-print-table-cell - done
-    // 2. Now make 2 functions to insert data inside the databse and get the data
-    // 3. bring it to an ejs file
-    const data = await get_payment_table_2(num_order_id);
-    console.log("The data for payment is = " + data);
-    res.render("payment_admin.ejs", { data,customer_id }); 
+    try {
+      const order_id = req.query.order_id;
+      console.log(order_id);
+      const num_order_id = parseInt(order_id);
+      console.log(num_order_id);
+      const customer_id = req.query.customer_id;
+      console.log(customer_id);
+      // 1. Firstly make functions to add and subtract sum of money that is required to make give the total d-print-table-cell - done
+      // 2. Now make 2 functions to insert data inside the databse and get the data
+      // 3. bring it to an ejs file
+      const data = await get_payment_table_2(num_order_id);
+      console.log("The data for payment is = " + data);
+      res.render("payment_admin.ejs", { data,customer_id }); 
+    } catch (error) {
+      res.json({
+        success: false,
+        message: "The order has already been paid or completed"
+      })
+    }
   }
 })
 
