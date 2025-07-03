@@ -64,12 +64,11 @@ app.post("/signup_add", async (req, res) => {
     const hash = await bcrypt.hash(password, 10);
     add_data(username, role, hash, email);
     res.redirect("/login");
-    
   } catch (error) {
     res.json({
       success: false,
-      message: "Some problem in signing up please try again after some time"
-    })
+      message: "Some problem in signing up please try again after some time",
+    });
   }
 });
 
