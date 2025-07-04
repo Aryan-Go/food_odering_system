@@ -42,7 +42,7 @@ import {
   get_payment_id,
   get_payment_status,
   get_payment_table_2
-} from "./config/database.js";
+} from "./database_queries/database.js";
 
 import jwt from "jsonwebtoken";
 
