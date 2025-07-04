@@ -1,12 +1,12 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 dotenv.config();
-const localhost = process.env.localhost;
+const host = process.env.host;
 const user = process.env.user;
 const password = process.env.password;
 
 const db = await mysql.createConnection({
-    localhost: localhost,
+    host: host,
     password: password,
     user: user,
     database:"food"

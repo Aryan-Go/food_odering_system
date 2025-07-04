@@ -10,8 +10,6 @@ import dotenv from "dotenv";
 dotenv.config();
 const port = process.env.port
 const secret = process.env.secret;
-const admin_email = process.env.admin_email;
-const admin_password = process.env.admin_password;
 
 import { fileURLToPath } from "url";
 import path from "path";
@@ -78,10 +76,8 @@ app.get("/login", (req, res) => {
 
 app.post("/login_add", async (req, res) => {
   const { email, password } = req.body;
-  console.log(admin_email);
   console.log(email);
   console.log(password);
-  console.log(admin_password);
     try {
         const payload = {
           email: email,
