@@ -44,6 +44,10 @@ import {
   get_payment_table_2
 } from "./database_queries/database.js";
 
+import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item } from "./app_functions/user_side.js";
+import { admin } from "./app_functions/admin.js";
+import { auth_checker } from "./app_functions/food.js";
+
 import jwt from "jsonwebtoken";
 
 app.set("view engine", "ejs");
@@ -128,91 +132,6 @@ app.get("/auth_reidrect", async (req, res) => {
   }
 });
 
-const auth_checker = async (req, res, next) => {
-  try {
-    const token = req.cookies.token;
-    console.log("token in auth redirect = " + token);
-    const payload = jwt.verify(token, secret);
-    console.log(payload);
-    req.user = payload;
-    next();
-  } catch (error) {
-    res.json({
-      success: false,
-      message: "You are not authorised. Please login once more"
-    });
-  }
-}
-
-const customer_home = async (req, res, next) => {
-  if (req.user.role == "customer" || req.user.role == "admin") {
-    next();
-  } else {
-    res.json({
-      success: false,
-      message:
-      "You are not authorised to enter as this is a protected route and your are logged in as chef",
-    });
-  }
-}
-
-const customer_menu = async (req, res, next) => {
-  if (req.user.role == "customer" || req.user.role == "admin") {
-    next();
-  } else {
-    res.json({
-      success: false,
-      message:
-      "You are not authorised to enter as this is a protected route and your are logged in as chef",
-    });
-  }
-};
-
-const admin = async (req, res, next) => {
-  if (req.user.role == "admin") {
-    next();
-  } else {
-    res.json({
-      success: false,
-      message:
-      "You are not authorised to enter as this is a protected route and your are logged in as admin",
-    });
-  }
-};
-
-const chef_home = async (req, res, next) => {
-  if (req.user.role == "chef" || req.user.role == "admin") {
-    next();
-  } else {
-    res.json({
-      success: false,
-      message:
-      "You are not authorised to enter as this is a protected route and your are logged in as customer",
-    });
-  }
-};
-const chef_order = async (req, res, next) => {
-  if (req.user.role == "chef" || req.user.role == "admin") {
-    next();
-  } else {
-    res.json({
-      success: false,
-      message:
-      "You are not authorised to enter as this is a protected route and your are logged in as customer",
-    });
-  }
-};
-const chef_complete_item = async (req, res, next) => {
-  if (req.user.role == "chef" || req.user.role == "admin") {
-    next();
-  } else {
-    res.json({
-      success: false,
-      message:
-      "You are not authorised to enter as this is a protected route and your are logged in as customer",
-    });
-  }
-};
 app.get("/admin",auth_checker,admin, (req, res) => {
   res.render("admin.ejs");
 })
