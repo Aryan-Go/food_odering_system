@@ -13,9 +13,9 @@
         <h1>Log in</h1>
         <form action="/login_add" method="POST" Content-Type="application/json">
             <label for="exampleInputEmail1">Email address</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" name="email">
+            <input required type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" name="email">
             <label for="exampleInputPassword1">Password</label>
-            <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
+            <input required type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
             <label for="role">Who are you??</label><br>
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>

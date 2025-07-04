@@ -44,7 +44,7 @@ import {
   get_payment_table_2
 } from "./database_queries/database.js";
 
-import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item } from "./middlewares/user_side.js";
+import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item,signup_nullity_check } from "./middlewares/user_side.js";
 import { admin } from "./middlewares/admin.js";
 import { auth_checker } from "./middlewares/food.js";
 
@@ -57,11 +57,24 @@ app.get("/", (req, res) => {
 })
 
 app.post("/signup_add", async (req, res) => {
-  const { username, email, password, role } = req.body;
+  const { username, email, password , password2, role } = req.body;
   try {
-    const hash = await bcrypt.hash(password, 10);
-    add_data(username, role, hash, email);
-    res.redirect("/login");
+    if (!signup_nullity_check(username, email, password, role)) {
+      if (password == password2) {
+        const hash = await bcrypt.hash(password, 10);
+        add_data(username, role, hash, email);
+        res.redirect("/login");
+      }
+      else {
+        const error = "Your password and confirm password were not a match please signup again"
+        res.render("error_page.ejs" , {error})
+      }
+    }
+    else {
+      const error =
+        "One or many of the required fields while signing up were empty. Please fill all of them";
+      res.render("error_page.ejs", { error });
+    }
   } catch (error) {
     // const e = "There has been some problem with sign up please che"
     res.render("error_page.ejs" , {error})
