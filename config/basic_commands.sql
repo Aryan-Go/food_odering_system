@@ -7,16 +7,16 @@ CREATE TABLE user(
     password VARCHAR(200) NOT NULL,
     role ENUM('chef','customer','admin')
 );
-INSERT INTO user (email,username,password,role) VALUES("admin@gmail.com","admin","admin","admin");
+INSERT INTO user (email,username,password,role) VALUES("admin@gmail.com","admin","$2y$10$c0y00oxODfZKBSMRXPiTf.qifp5XKVgTI4Y5lTOaHPm8RVG7h8vFS","admin");
 
 CREATE TABLE category(
     category_id INT PRIMARY KEY AUTO_INCREMENT,
     category_name VARCHAR(100) NOT NULL,
     category_desc VARCHAR(400) NOT NULL
 );
-DROP TABLE category;
+-- DROP TABLE category;
 SELECT * FROM category;
-TRUNCATE TABLE category;
+-- TRUNCATE TABLE category;
 INSERT INTO category (category_name,category_desc) VALUES ("starters","A tempting medley of crispy, spicy, and savory bites that ignite your appetite and set the perfect tone for the feast ahead.");
 INSERT INTO category (category_name,category_desc) VALUES ("main course","A hearty and flavorful spread of rich curries, sizzling stir-fries, and comforting classics crafted to satisfy every craving and steal the spotlight.");
 INSERT INTO category (category_name,category_desc) VALUES ("desert","An indulgent finale of sweet delights, where every bite melts in your mouth and leaves a lingering taste of bliss.");
@@ -29,13 +29,13 @@ CREATE TABLE food_menu(
     category_id INT,
     FOREIGN KEY (category_id) REFERENCES category(category_id)
 );
-SET FOREIGN_KEY_CHECKS = 0;
-DROP TABLE food_menu;
-SET FOREIGN_KEY_CHECKS = 1;
+-- SET FOREIGN_KEY_CHECKS = 0;
+-- DROP TABLE food_menu;
+-- SET FOREIGN_KEY_CHECKS = 1;
 SELECT * FROM food_menu;
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE food_menu;
-SET FOREIGN_KEY_CHECKS = 1;
+-- SET FOREIGN_KEY_CHECKS = 0;
+-- TRUNCATE TABLE food_menu;
+-- SET FOREIGN_KEY_CHECKS = 1;
 INSERT INTO food_menu (food_name,description,price,category_id) VALUES ("Paneer Tikka" , "Paneer Tikka is a popular Indian appetizer made from marinated paneer cubes grilled or roasted to perfection with spices and vegetables.",300.00,1);
 INSERT INTO food_menu (food_name,description,price,category_id) VALUES ("Dahi Kebab" , "Dahi Kebab is a soft and creamy North Indian snack made from hung curd, paneer, and mild spices, lightly pan-fried for a crispy outer layer.",250.00,1);
 INSERT INTO food_menu (food_name,description,price,category_id) VALUES ("Sushi" , "Sushi is a traditional Japanese dish made with vinegared rice, often paired with raw or cooked seafood, vegetables, and wrapped in seaweed.",450.00,1);
