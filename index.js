@@ -63,10 +63,8 @@ app.post("/signup_add", async (req, res) => {
     add_data(username, role, hash, email);
     res.redirect("/login");
   } catch (error) {
-    res.json({
-      success: false,
-      message: "Some problem in signing up please try again after some time",
-    });
+    // const e = "There has been some problem with sign up please che"
+    res.render("error_page.ejs" , {error})
   }
 });
 
@@ -91,10 +89,7 @@ app.post("/login_add", async (req, res) => {
         }
       
     } catch (error) {
-      res.json({
-        success: false,
-        message: "Some problem in verifying the user. If not signed up then please do once"
-      });
+      res.render("error_page.ejs", { error });
       }
 });
 
@@ -121,10 +116,7 @@ app.get("/auth_reidrect", async (req, res) => {
     }
     
   else {
-    res.status(500).json({
-      success: false,
-      message: "Some error with authentication",
-    });
+    res.render("error_page.ejs", { error });
   }
 });
 
@@ -179,10 +171,8 @@ app.post("/food_items_added", async (req, res) => {
   const chef_id = await chef_id_free();
   console.log("IN index.js = " + chef_id);
   if (chef_id == -1) {
-    res.status(400).json({
-      success: false,
-      message: "No chef is available at this moment"
-    });
+    const error="No chef is available at this moment"
+    res.render("error_page.ejs" , {error})
   }
   else {
     await add_order_table(customer_id, "left", chef_id);
@@ -230,10 +220,7 @@ app.get("/waiting_page", async (req, res) => {
       res.redirect(`/payment?order_id=${num_order_id}`);
     }
   } catch (error) {
-    res.json({
-      success: false,
-      message: error
-    })
+    res.render("error_page.ejs", { error });
   }
 });
 
@@ -264,16 +251,11 @@ app.get("/payment", auth_checker, customer_home, async (req, res) => {
         res.render("payment_admin.ejs", { data,customer_id }); 
       }
       else {
-        res.json({
-          success: false,
-          message: "The order has already been paid or completed",
-        });
+        const error = "The order has already been paid or completed"
+        res.render("error_page.ejs", { error });
       }
     } catch (error) {
-      res.json({
-        success: false,
-        message: "The order has already been paid or completed"
-      })
+      res.render("error_page.ejs", { error });
     }
   }
 })
@@ -298,10 +280,7 @@ app.post("/payment_done",auth_checker,customer_home,async (req, res) => {
     });
     
   } catch (error) {
-    res.json({
-      success: false,
-      message: error
-    })
+    res.render("error_page.ejs", { error });
   }
 })
 
@@ -320,10 +299,7 @@ app.post("/payment_done_admin", auth_checker, customer_home, async (req, res) =>
       message: "The payment is done now",
     });
   } catch (error) {
-    res.json({
-      success: false,
-      message: error,
-    });
+    res.render("error_page.ejs", { error });
   }
 });
 
@@ -341,10 +317,8 @@ app.get("/order", auth_checker, chef_order, async (req, res) => {
       res.render("order.ejs", { data });
     }
     else {
-      res.json({
-        success: false,
-        message: "Either the order is completed or there is no such order id please check once"
-      })
+      const error = "Either the order has been completed or there is no such order id"
+      res.render("error_page.ejs", { error });
     }
   }
   else {
