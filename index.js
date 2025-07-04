@@ -53,10 +53,6 @@ import jwt from "jsonwebtoken";
 app.set("view engine", "ejs");
 
 app.get("/", (req, res) => {
-    res.render("home.ejs");
-})
-
-app.get("/signup", (req, res) => {
     res.render("signup.ejs");
 })
 
