@@ -86,7 +86,7 @@ CREATE TABLE `order_table` (
   KEY `chef_id` (`chef_id`),
   CONSTRAINT `order_table_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `user` (`user_id`),
   CONSTRAINT `order_table_ibfk_2` FOREIGN KEY (`chef_id`) REFERENCES `user` (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -95,7 +95,7 @@ CREATE TABLE `order_table` (
 
 LOCK TABLES `order_table` WRITE;
 /*!40000 ALTER TABLE `order_table` DISABLE KEYS */;
-INSERT INTO `order_table` VALUES (1,3,'completed',2),(2,3,'completed',2),(3,3,'completed',2),(4,3,'completed',2),(5,3,'completed',2),(6,3,'completed',2),(7,3,'completed',2);
+INSERT INTO `order_table` VALUES (1,3,'completed',2),(2,3,'completed',2),(3,3,'completed',2),(4,3,'completed',2),(5,3,'completed',2),(6,3,'completed',2),(7,3,'completed',2),(8,3,'completed',2),(9,3,'completed',2);
 /*!40000 ALTER TABLE `order_table` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -125,7 +125,7 @@ CREATE TABLE `ordered_items` (
 
 LOCK TABLES `ordered_items` WRITE;
 /*!40000 ALTER TABLE `ordered_items` DISABLE KEYS */;
-INSERT INTO `ordered_items` VALUES (1,2,'jkdkhfkjsh',2,'completed'),(1,2,'jkdkhfkjsh',3,'completed'),(1,2,'jkdkhfkjsh',4,'completed'),(1,2,'wetwertwert',6,'completed'),(1,1,'This is some special instructions',7,'completed'),(2,2,'jkdkhfkjsh',1,'completed'),(2,2,'jkdkhfkjsh',2,'completed'),(3,2,'jkdkhfkjsh',3,'completed'),(4,2,'jkdkhfkjsh',4,'completed'),(5,2,'jkdkhfkjsh',1,'completed'),(7,2,'jkdkhfkjsh',4,'completed');
+INSERT INTO `ordered_items` VALUES (1,2,'jkdkhfkjsh',2,'completed'),(1,2,'jkdkhfkjsh',3,'completed'),(1,2,'jkdkhfkjsh',4,'completed'),(1,2,'wetwertwert',6,'completed'),(1,1,'This is some special instructions',7,'completed'),(1,2,'',8,'completed'),(1,2,'',9,'completed'),(2,2,'jkdkhfkjsh',1,'completed'),(2,2,'jkdkhfkjsh',2,'completed'),(3,2,'jkdkhfkjsh',3,'completed'),(4,2,'jkdkhfkjsh',4,'completed'),(4,2,'',8,'completed'),(5,2,'jkdkhfkjsh',1,'completed'),(7,2,'jkdkhfkjsh',4,'completed');
 /*!40000 ALTER TABLE `ordered_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -148,7 +148,7 @@ CREATE TABLE `payment_table` (
   KEY `order_id` (`order_id`),
   CONSTRAINT `payment_table_ibfk_1` FOREIGN KEY (`customer_id`) REFERENCES `user` (`user_id`),
   CONSTRAINT `payment_table_ibfk_2` FOREIGN KEY (`order_id`) REFERENCES `order_table` (`order_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -157,7 +157,7 @@ CREATE TABLE `payment_table` (
 
 LOCK TABLES `payment_table` WRITE;
 /*!40000 ALTER TABLE `payment_table` DISABLE KEYS */;
-INSERT INTO `payment_table` VALUES (1900,NULL,'completed',1,3,1),(1400,NULL,'completed',2,3,2),(1100,NULL,'completed',3,3,3),(1800,NULL,'completed',4,3,4),(500,NULL,'completed',6,3,5),(250,NULL,'completed',7,3,6);
+INSERT INTO `payment_table` VALUES (1900,NULL,'completed',1,3,1),(1400,NULL,'completed',2,3,2),(1100,NULL,'completed',3,3,3),(1800,NULL,'completed',4,3,4),(500,NULL,'completed',6,3,5),(250,NULL,'completed',7,3,6),(1500,NULL,'completed',8,3,7),(500,NULL,'completed',9,3,8);
 /*!40000 ALTER TABLE `payment_table` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -175,7 +175,7 @@ CREATE TABLE `user` (
   `password` varchar(200) NOT NULL,
   `role` enum('chef','customer','admin') DEFAULT NULL,
   PRIMARY KEY (`user_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -184,7 +184,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'admin@gmail.com','admin','admin','admin'),(2,'r@g.com','r','$2b$10$ZAHWzS.K52dLcFoCbv1s5.qKJ8b340H5wZ6wjm6240PB0uK/uUGpq','chef'),(3,'goyal.aryan@gmail.com','a','$2b$10$GGWuMAOrz9dJd1M0g0VWMe.eogHrnQpf7W.cetqtu3DZyMNtn.8ri','customer'),(4,'aayush@gmail.com','aayush','$2b$10$gI0b0nk1U52XthQ96QYII.Kn.0Sy4tONqyXYNn8zxW9Dr6vFgoBmG','customer');
+INSERT INTO `user` VALUES (1,'admin@gmail.com','admin','admin','admin'),(2,'r@g.com','r','$2b$10$ZAHWzS.K52dLcFoCbv1s5.qKJ8b340H5wZ6wjm6240PB0uK/uUGpq','chef'),(3,'goyal.aryan@gmail.com','a','$2b$10$GGWuMAOrz9dJd1M0g0VWMe.eogHrnQpf7W.cetqtu3DZyMNtn.8ri','customer'),(4,'aayush@gmail.com','aayush','$2b$10$gI0b0nk1U52XthQ96QYII.Kn.0Sy4tONqyXYNn8zxW9Dr6vFgoBmG','customer'),(5,'goyal.aryan@gmail.com','a','$2b$10$JdQ/BvtOwvYuRKKBMLN9qu1h4FVEtnOKerlm/Emc3krIeJoV2sVGe','customer');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -197,4 +197,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-04 16:48:06
+-- Dump completed on 2025-07-04 17:32:30

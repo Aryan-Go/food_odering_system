@@ -8,6 +8,7 @@ CREATE TABLE user(
     role ENUM('chef','customer','admin')
 );
 INSERT INTO user (email,username,password,role) VALUES("admin@gmail.com","admin","$2y$10$c0y00oxODfZKBSMRXPiTf.qifp5XKVgTI4Y5lTOaHPm8RVG7h8vFS","admin");
+INSERT INTO user (email,username,password,role) VALUES("chef@gmail.com","chef","$2y$10$TW9WExetj3vn2AbvfJmoGOuQ3MpqpI3kOYvyOII1PHp2TGOoNhiMG","chef");
 
 CREATE TABLE category(
     category_id INT PRIMARY KEY AUTO_INCREMENT,
