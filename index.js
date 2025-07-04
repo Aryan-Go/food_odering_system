@@ -44,9 +44,9 @@ import {
   get_payment_table_2
 } from "./database_queries/database.js";
 
-import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item } from "./app_functions/user_side.js";
-import { admin } from "./app_functions/admin.js";
-import { auth_checker } from "./app_functions/food.js";
+import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item } from "./middlewares/user_side.js";
+import { admin } from "./middlewares/admin.js";
+import { auth_checker } from "./middlewares/food.js";
 
 import jwt from "jsonwebtoken";
 
