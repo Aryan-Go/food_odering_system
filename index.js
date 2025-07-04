@@ -41,7 +41,8 @@ import {
   update_payment_table,
   get_payment_id,
   get_payment_status,
-  get_payment_table_2
+  get_payment_table_2,
+  get_food_item_name
 } from "./database_queries/database.js";
 
 import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item,signup_nullity_check } from "./middlewares/user_side.js";
@@ -219,8 +220,15 @@ app.get("/waiting_page", async (req, res) => {
     const data = await get_ordered_items(num_order_id);
     console.log(data)
     if (data.length > 0) {
+      let food_name = [];
+      for (let i = 0; i < data.length; i++) {
+        const [data2] = await get_food_item_name(data[i].food_id);
+        console.log("This is data2.food_name" , data2.food_name);
+        food_name.push(data2.food_name);
+      }
+      console.log(food_name)
       console.log("Just before render = " + num_order_id);
-      res.render("waiting_page.ejs", { data ,num_order_id});
+      res.render("waiting_page.ejs", { food_name,data ,num_order_id});
     }
     else {
       const token = req.cookies.token;
@@ -327,7 +335,15 @@ app.get("/order", auth_checker, chef_order, async (req, res) => {
       console.log(data);
     const check = await status_order_id(order_id);
     if (data.length > 0) {
-      res.render("order.ejs", { data });
+      let food_name = [];
+      for (let i = 0; i < data.length; i++) {
+        const [data2] = await get_food_item_name(data[i].food_id);
+        console.log("This is data2.food_name", data2.food_name);
+        food_name.push(data2.food_name);
+      }
+      console.log(food_name);
+      
+      res.render("order.ejs", {food_name, data });
     }
     else {
       const error = "Either the order has been completed or there is no such order id"
@@ -352,7 +368,13 @@ app.get("/order", auth_checker, chef_order, async (req, res) => {
     else {
       data = [];
     }
-    res.render("order.ejs", { data });
+    let food_name = [];
+    for (let i = 0; i < data.length; i++) {
+      const [data2] = await get_food_item_name(data[i].food_id);
+      console.log("This is data2.food_name", data2.food_name);
+      food_name.push(data2.food_name);
+    }
+    res.render("order.ejs", { data,food_name });
   }
 })
 

@@ -310,3 +310,8 @@ export const update_payment_table = async (customer_id,payment_id) => {
 //   );
     
 // };
+
+export const get_food_item_name = async (food_id) => {
+  const [data] = await db.query(`SELECT * FROM food_menu WHERE food_id = ?`, [food_id]);
+  return data;
+}
