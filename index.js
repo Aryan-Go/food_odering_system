@@ -45,7 +45,7 @@ import {
   get_food_item_name
 } from "./database_queries/database.js";
 
-import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item,signup_nullity_check } from "./middlewares/user_side.js";
+import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item,signup_nullity_check,validate_email } from "./middlewares/user_side.js";
 import { admin } from "./middlewares/admin.js";
 import { auth_checker } from "./middlewares/food.js";
 
@@ -63,15 +63,22 @@ app.post("/signup_add", async (req, res) => {
   // console.log(signup_nullity_check(username, email, password, role))
   try {
     if (signup_nullity_check(username, email, password, role) == false) {
-      if (password == password2) {
-        const hash = await bcrypt.hash(password, 10);
-        add_data(username, role, hash, email);
-        res.redirect("/login");
+      if (validate_email(email)) {
+        if (password == password2) {
+          const hash = await bcrypt.hash(password, 10);
+          add_data(username, role, hash, email);
+          res.redirect("/login");
+        }
+        else {
+          const error = "Your password and confirm password were not a match please signup again"
+          res.render("signup_error.ejs" , {error,username,email,password,password2,role})
+        }
       }
       else {
-        const error = "Your password and confirm password were not a match please signup again"
+        const error = "Your email id is not valid"
         res.render("signup_error.ejs" , {error,username,email,password,password2,role})
       }
+      
     }
     else {
       const error =
