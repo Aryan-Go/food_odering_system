@@ -31,6 +31,21 @@ export const check_email = async (email) => {
     }
 }
 
+export const check_same_email = async (email) => {
+  const [number] = await db.query(
+    `SELECT COUNT(*) as count FROM user WHERE email = (?);`,
+    [email]
+  );
+  console.log(number[0].count);
+  if (number[0].count > 0) {
+    console.log(true);
+    return true;
+  } else {
+    console.log(false);
+    return false;
+  }
+};
+
 export const find_role = async (email) => {
     const [data] = await db.query(
         `SELECT * FROM user WHERE email = (?);`, [email]);
