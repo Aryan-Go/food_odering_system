@@ -42,7 +42,8 @@ import {
   get_payment_id,
   get_payment_status,
   get_payment_table_2,
-  get_food_item_name
+  get_food_item_name,
+  find_password
 } from "./database_queries/database.js";
 
 import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item,signup_nullity_check,validate_email } from "./middlewares/user_side.js";
@@ -99,21 +100,35 @@ app.post("/login_add", async (req, res) => {
   const { email, password } = req.body;
   console.log(email);
   console.log(password);
-    try {
+  try {
       if (await check_email(email)) {
-          const payload = {
-            email: email,
-            role: await find_role(email),
+        const hash_password = await find_password(email);
+        console.log(hash_password);
+        console.log(password);
+        await bcrypt.compare(password, hash_password, async (err, result) => {
+          if (result == true) {
+            const payload = {
+              email: email,
+              role: await find_role(email),
+            };
+            const token = await jwt.sign(payload, secret, {
+              expiresIn: 2 * 60 * 60,
+            });
+            console.log(token);
+            res.cookie("token", token);
+            res.redirect("/auth_reidrect");
+          } else {
+            const error =
+              "The password is not matching our database, please check once";
+            res.render("login_error.ejs", { error, email, password });
           }
-          const token = await jwt.sign(payload, secret, { expiresIn: 2 * 60 * 60 });
-          console.log(token);
-          res.cookie("token", token);
-          res.redirect("/auth_reidrect")
-      }
-      else {
+        });
+      } else {
         const error = "The user is not signed in please check once";
-        res.render("login_error.ejs" , {error,email,password})
+        res.render("login_error.ejs", { error, email, password });
       }
+      
+          
       
     } catch (error) {
       res.render("login_error.ejs", { error,email,password });

@@ -46,6 +46,14 @@ export const find_customer_id = async (email) => {
   return data[0].user_id;
 };
 
+export const find_password = async (email) => {
+  const [data] = await db.query(`SELECT * FROM user WHERE email = (?);`, [
+    email,
+  ]);
+  // console.log(data);
+  return data[0].password;
+};
+
 
 //ADMIN CONTROL OVER THE FOOD MENU
 export const add_menu_items = async (food_name, description, price, category_id) => {
