@@ -161,6 +161,12 @@ app.post("/login_add", async (req, res) => {
       }
 });
 
+app.get("/logout", (req, res) => {
+  res.clearCookie("jwt", { httpOnly: true });
+  console.log("Person has been logged out successfully")
+  res.redirect("/login");
+})
+
 app.get("/auth_reidrect", async (req, res) => {
   console.log("I am in");
     const token = req.cookies.token;
