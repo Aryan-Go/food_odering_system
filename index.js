@@ -44,7 +44,9 @@ import {
   get_payment_table_2,
   get_food_item_name,
   find_password,
-  check_same_email
+  check_same_email,
+  get_incomplete_food_id,
+  get_unpaid_food_id
 } from "./database_queries/database.js";
 
 import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item,signup_nullity_check,validate_email } from "./middlewares/user_side.js";
@@ -185,18 +187,19 @@ app.get("/auth_reidrect", async (req, res) => {
   }
 });
 
-app.get("/admin",auth_checker,admin, (req, res) => {
-  res.render("admin.ejs");
+app.get("/admin", auth_checker, admin, async(req, res) => {
+  const data = await get_incomplete_food_id();
+  const data_2 = await get_unpaid_food_id();
+  res.render("admin.ejs" , {data,data_2});
 })
 app.post("/admin_working",auth_checker,admin, (req, res) => {
   const order_id = req.body.order_id;
   const order_id_2 = req.body.order_id_2;
-  const customer_id = req.body.customer_id;
   if (order_id != undefined) {
     res.redirect(`/order?order_id=${order_id}`);
   }
   else if (order_id_2 != undefined) {
-    res.redirect(`/payment?order_id=${order_id_2}&customer_id=${customer_id}`);
+    res.redirect(`/payment?order_id=${order_id_2}`);
   }
 })
 
@@ -312,14 +315,14 @@ app.get("/payment", auth_checker, customer_home, async (req, res) => {
       console.log(order_id);
       const num_order_id = parseInt(order_id);
       console.log(num_order_id);
-      const customer_id = req.query.customer_id;
-      console.log(customer_id);
       // 1. Firstly make functions to add and subtract sum of money that is required to make give the total d-print-table-cell - done
       // 2. Now make 2 functions to insert data inside the databse and get the data
       // 3. bring it to an ejs file
       const data = await get_payment_table_2(num_order_id);
       console.log("The data for payment is = " + data);
       if (data.length > 0) {
+        const customer_id = data[0].customer_id;
+        console.log(customer_id);
         res.render("payment_admin.ejs", { data,customer_id }); 
       }
       else {
@@ -367,13 +370,17 @@ app.post("/payment_done_admin", auth_checker, customer_home, async (req, res) =>
     const t = req.body.total;
     const customer_id = req.body.customer_id;
     console.log(customer_id);
-    // const total = parseInt(req.body.total) + parseInt((req.body.tip / 100) * req.body.total);
+    const total = parseInt(req.body.total) + parseInt((req.body.tip / 100) * req.body.total);
     const payment_id = await get_payment_id(customer_id, num_order_id);
     console.log(payment_id);
     await update_payment_table(customer_id, payment_id[0].payment_id);
-    res.render("payment_success.ejs", {customer_id,num_order_id , t})
+    res.render("payment_success.ejs", {total,customer_id,num_order_id , t})
   } catch (error) {
-    res.render("error_page.ejs", { error });
+    const num_order_id = req.body.order_id;
+    console.log(num_order_id);
+    const customer_id = req.body.customer_id;
+    console.log(customer_id);
+    res.render("payment_error.ejs", { error,customer_id, num_order_id });
   }
 });
 

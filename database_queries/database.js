@@ -338,3 +338,18 @@ export const get_food_item_name = async (food_id) => {
   const [data] = await db.query(`SELECT * FROM food_menu WHERE food_id = ?`, [food_id]);
   return data;
 }
+
+export const get_incomplete_food_id = async () => {
+  const status = "left";
+  const [data] = await db.query(`SELECT * FROM order_table WHERE food_status=?`, [status]);
+  return data;
+}
+
+export const get_unpaid_food_id = async () => {
+  const status = "left";
+  const [data] = await db.query(
+    `SELECT * FROM payment_table WHERE payment_status=?`,
+    [status]
+  );
+  return data;
+};

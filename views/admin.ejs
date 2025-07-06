@@ -22,16 +22,22 @@
         <h2 class="py-[2rem]">Order and its Preperation</h2>
         <form action="/admin_working" method="post">
             <label for="quant" class="px-[4rem] font-bold">Order_id</label>
-            <input type="number" value=0 name="order_id" min="0" class="quant w-[5rem] text-center border-dashed border-black"><br><br>
+            <select name="order_id">
+                <% data.forEach((data_row,index) => { %>
+                    <option value="<%= data_row.order_id %>"><%= data_row.order_id %></option>
+                <% }) %>
+            </select><br><br>
             <button type="submit" class="text-center text-4xl font-bold w-[30%] bg-[#F4D871] px-[2rem] py-[0.5rem] mb-30">Submit Chef_id</button>
         </form>
 
         <h2 class="py-[2rem]">Payment_table</h2>
         <form action="/admin_working" method="post">
             <label for="quant" class="px-[4rem] font-bold">order_id</label>
-            <input type="number" name="order_id_2" min="0" class="quant w-[5rem] text-center border-dashed border-black" required><br><br>
-            <label for="quant" class="px-[4rem] font-bold">Customer ID</label>
-            <input type="number" name="customer_id" min="0" class="quant w-[5rem] text-center border-dashed border-black" required><br><br>
+            <select name="order_id_2">
+                <% data_2.forEach((data_row,index) => { %>
+                    <option value="<%= data_row.order_id %>"><%= data_row.order_id %></option>
+                <% }) %>
+            </select><br><br>
             <button type="submit" class="text-center text-4xl font-bold w-[30%] bg-[#F4D871] px-[2rem] py-[0.5rem] mb-30">Submit order_id</button>
         </form>
     </div>
