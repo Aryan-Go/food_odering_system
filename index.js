@@ -46,11 +46,12 @@ import {
   find_password,
   check_same_email,
   get_incomplete_food_id,
-  get_unpaid_food_id
+  get_unpaid_food_id,
+  convert_customer_chef
 } from "./database_queries/database.js";
 
 import { customer_home,customer_menu,chef_home,chef_order,chef_complete_item,signup_nullity_check,validate_email } from "./middlewares/user_side.js";
-import { admin } from "./middlewares/admin.js";
+import { admin,customer_chef,request_customer_chef } from "./middlewares/admin.js";
 import { auth_checker } from "./middlewares/food.js";
 
 import jwt from "jsonwebtoken";
@@ -190,16 +191,22 @@ app.get("/auth_reidrect", async (req, res) => {
 app.get("/admin", auth_checker, admin, async(req, res) => {
   const data = await get_incomplete_food_id();
   const data_2 = await get_unpaid_food_id();
-  res.render("admin.ejs" , {data,data_2});
+  res.render("admin.ejs" , {data,data_2,customer_chef});
 })
 app.post("/admin_working",auth_checker,admin, (req, res) => {
   const order_id = req.body.order_id;
   const order_id_2 = req.body.order_id_2;
+  const customer_id = req.body.customer_id;
   if (order_id != undefined) {
     res.redirect(`/order?order_id=${order_id}`);
   }
   else if (order_id_2 != undefined) {
     res.redirect(`/payment?order_id=${order_id_2}`);
+  }
+  else if (customer_id != undefined) {
+    const error = "The customer has been converted into chef successfully"
+    convert_customer_chef(customer_id);
+    res.render("success_page.ejs" , {error})
   }
 })
 
@@ -209,6 +216,15 @@ app.get("/chef", auth_checker, chef_home ,(req, res) => {
 
 app.get("/customer", auth_checker, customer_home ,(req, res) => {
   res.render("customer.ejs");
+});
+
+app.get("/customer_chef", auth_checker, customer_home, async (req, res) => {
+  const token = req.cookies.token;
+  console.log("token in auth redirect = " + token);
+  const payload = jwt.verify(token, secret);
+  const customer_id = await find_customer_id(payload.email);
+  await request_customer_chef(customer_id);
+  res.render("customer_chef.ejs");
 });
 
 app.get("/menu", auth_checker, customer_menu, async (req, res) => {

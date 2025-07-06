@@ -40,6 +40,16 @@
             </select><br><br>
             <button type="submit" class="text-center text-4xl font-bold w-[30%] bg-[#F4D871] px-[2rem] py-[0.5rem] mb-30">Submit order_id</button>
         </form>
+        <h2>Convert to chef</h2>
+        <form action="/admin_working" method="post">
+            <label for="quant" class="px-[4rem] font-bold">Customer id who want to be a chef</label>
+            <select name="customer_id">
+                <% customer_chef.forEach((data_row,index) => { %>
+                    <option value="<%= data_row %>"><%= data_row %></option>
+                <% }) %>
+            </select><br><br>
+            <button type="submit" class="text-center text-4xl font-bold w-[30%] bg-[#F4D871] px-[2rem] py-[0.5rem] mb-30">Submit customer_id</button>
+        </form>
     </div>
 </body>
 </html>

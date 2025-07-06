@@ -5,6 +5,8 @@ const host = process.env.host;
 const user = process.env.user;
 const password = process.env.password;
 
+
+
 const db = await mysql.createConnection({
     host: host,
     password: password,
@@ -353,3 +355,9 @@ export const get_unpaid_food_id = async () => {
   );
   return data;
 };
+
+export const convert_customer_chef = async (customer_id) => {
+  const role = "chef"
+  await db.query(`UPDATE user SET role=? WHERE user_id=?;` , [role, customer_id])
+  console.log("The role has been changes")
+}
