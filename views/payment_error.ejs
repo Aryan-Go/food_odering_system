@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="text-center">
+    <nav class="navbar sticky-top bg-body-tertiary" style="background-color: #e3f2fd;" data-bs-theme="light">
+        <div class="container-fluid">
+          <a class="navbar-brand"><img class="w-[5rem]" src="/image/logo-removebg.png" alt="logo"></a>
+          <div class="flex justify-around items-center w-[20%]" role="search">
+          </div>
+        </div>
+    </nav>
+    <form action="/payment_done_admin" method="post" class="text-center">
+        <div class="h-[100vh] w-[100vw] bg-[url(/image/payment_back.webp)] bg-no-repeat bg-size-[length:100%_100%] text-center flex flex-col items-center gap-2rem text-center"">
+            <div class="mb-3">
+                <label for="exampleInputEmail1" class="form-label">For order_id</label>
+                <input type="number" value='<%= num_order_id %>' readonly min="0" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="order_id">
+              </div>
+                <div class="mb-3">
+                  <label for="exampleInputEmail1" class="form-label">Total Payment</label>
+                  <input type="number" value='<%= t %>' readonly min="0" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="total">
+                </div>
+                <div class="mb-3">
+                    <label for="exampleInputEmail1" class="form-label">Customer ID</label>
+                    <input type="number" value='<%= customer_id %>' readonly min="0" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="customer_id" readonly>
+                  </div>
+                <div class="mb-3">
+                    <p class="text-[2rem] font-bold m-[2rem] text-red-500"><%= error %></p>
+                </div>
+            </div>
+        </form>
+</body>
+</html>

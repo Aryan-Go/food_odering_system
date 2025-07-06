@@ -337,6 +337,7 @@ app.post("/payment_done",auth_checker,customer_home,async (req, res) => {
     const num_order_id = req.body.order_id;
     console.log(num_order_id);
     console.log("Total = " + req.body.total);
+    const t = req.body.total;
     const total = parseInt(req.body.total) + parseInt((req.body.tip / 100) * req.body.total);
     const token = req.cookies.token;
     console.log("token in auth redirect = " + token);
@@ -346,13 +347,15 @@ app.post("/payment_done",auth_checker,customer_home,async (req, res) => {
     const payment_id = await get_payment_id(customer_id, num_order_id)
     console.log(payment_id);
     await update_payment_table(customer_id,payment_id[0].payment_id);
-    res.json({
-      success: true,
-      message: "The total amount paid is = " + total
-    });
+    res.render("payment_success.ejs", {customer_id,total,num_order_id , t})
     
   } catch (error) {
-    res.render("error_page.ejs", { error });
+    res.render("payment_error.ejs", {
+      error,customer_id,
+      total,
+      num_order_id,
+      t,
+    });
   }
 })
 
@@ -361,15 +364,14 @@ app.post("/payment_done_admin", auth_checker, customer_home, async (req, res) =>
     const num_order_id = req.body.order_id;
     console.log(num_order_id);
     console.log("Total = " + req.body.total);
+    const t = req.body.total;
     const customer_id = req.body.customer_id;
     console.log(customer_id);
+    // const total = parseInt(req.body.total) + parseInt((req.body.tip / 100) * req.body.total);
     const payment_id = await get_payment_id(customer_id, num_order_id);
     console.log(payment_id);
     await update_payment_table(customer_id, payment_id[0].payment_id);
-    res.json({
-      success: true,
-      message: "The payment is done now",
-    });
+    res.render("payment_success.ejs", {customer_id,num_order_id , t})
   } catch (error) {
     res.render("error_page.ejs", { error });
   }
