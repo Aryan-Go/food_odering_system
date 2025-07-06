@@ -59,7 +59,7 @@ export const chef_complete_item = async (req, res, next) => {
   }
 };
 
-export const signup_nullity_check = async (username,email,password,role) => {
+export const signup_nullity_check = (username,email,password,role) => {
   if (username == null || username == undefined || email == null || email == undefined || password == null || password == undefined || role == null || role == undefined) {
     return true;
   }

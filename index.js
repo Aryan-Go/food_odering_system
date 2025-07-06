@@ -58,9 +58,11 @@ app.get("/", (req, res) => {
 })
 
 app.post("/signup_add", async (req, res) => {
-  const { username, email, password , password2, role } = req.body;
+  const { username, email, password, password2, role } = req.body;
+  // console.log(username, email, password, password2, role);
+  // console.log(signup_nullity_check(username, email, password, role))
   try {
-    if (!signup_nullity_check(username, email, password, role)) {
+    if (signup_nullity_check(username, email, password, role) == false) {
       if (password == password2) {
         const hash = await bcrypt.hash(password, 10);
         add_data(username, role, hash, email);
@@ -68,13 +70,13 @@ app.post("/signup_add", async (req, res) => {
       }
       else {
         const error = "Your password and confirm password were not a match please signup again"
-        res.render("error_page.ejs" , {error})
+        res.render("signup_error.ejs" , {error,username,email,password,password2,role})
       }
     }
     else {
       const error =
         "One or many of the required fields while signing up were empty. Please fill all of them";
-      res.render("error_page.ejs", { error });
+      res.render("signup_error.ejs", {error,username,email,password,password2,role,});
     }
   } catch (error) {
     // const e = "There has been some problem with sign up please che"
@@ -91,19 +93,23 @@ app.post("/login_add", async (req, res) => {
   console.log(email);
   console.log(password);
     try {
-        const payload = {
-          email: email,
-          role: await find_role(email),
-        }
-        if (await check_email(email)) {
+      if (await check_email(email)) {
+          const payload = {
+            email: email,
+            role: await find_role(email),
+          }
           const token = await jwt.sign(payload, secret, { expiresIn: 2 * 60 * 60 });
           console.log(token);
           res.cookie("token", token);
           res.redirect("/auth_reidrect")
-        }
+      }
+      else {
+        const error = "The user is not signed in please check once";
+        res.render("login_error.ejs" , {error,email,password})
+      }
       
     } catch (error) {
-      res.render("error_page.ejs", { error });
+      res.render("login_error.ejs", { error,email,password });
       }
 });
 
@@ -346,8 +352,14 @@ app.get("/order", auth_checker, chef_order, async (req, res) => {
       res.render("order.ejs", {food_name, data });
     }
     else {
-      const error = "Either the order has been completed or there is no such order id"
-      res.render("error_page.ejs", { error });
+      if (data == null || data == undefined) {
+        const error = "There is no such order";
+        res.render("error_page.ejs", { error });
+      }
+      else {
+        const error = "The order has been completed"
+        res.render("success_page.ejs", { error });
+      }
     }
   }
   else {

@@ -11,22 +11,22 @@
 <body class="h-[100vh] bg-[url(/image/signup2.webp)] bg-no-repeat bg-size-[length:100vw_100vh] flex flex-col justify-center items-center bg-center">
     <div class="flex flex-col m-[2rem] items-center justify-center bg-black w-[30%] gap-[3rem] p-[2rem] text-white h-full">
         <h1>Sign up</h1>
-        <form action="/signup_add" method="POST" Content-Type="application/json">
+        <form action="/" method="GET" Content-Type="application/json">
             <label for="username">Username</label>
-            <input type="text" class="form-control" id="username" placeholder="Username here" name="username">
+            <input type="text" readonly value="<%= username %>" class="form-control" id="username" placeholder="Username here" name="username">
             <label for="exampleInputEmail1">Email address</label>
-            <input required type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" name="email">
+            <input required readonly value="<%= email %>"  type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" name="email">
             <small id="emailHelp" class="form-text text-white">We'll never share your email with anyone else.</small><br>
             <label for="exampleInputPassword1">Password</label>
-            <input required type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
+            <input required readonly value="<%= password %>"  type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
             <label for="exampleInputPassword2">Confirm Password</label>
-            <input required type="password" class="form-control" id="exampleInputPassword2" placeholder="Confirm Password" name="password2">
+            <input required readonly value="<%= password2 %>"  type="password" class="form-control" id="exampleInputPassword2" placeholder="Confirm Password" name="password2">
             <label for="role">Who are you??</label><br>
-            <input required type="checkbox" class="form-check-input" id="exampleCheck1" name="role" value="customer">
+            <input required readonly value="<%= role %>"  type="checkbox" class="form-check-input" id="exampleCheck1" name="role" value="customer">
             <label class="form-check-label" for="exampleCheck1">Customer</label><br>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Go back to sign up page</button>
           </form>
-          
+          <div class="text-red-500 text-[1rem] font-bold"><%= error %></div>
     </div>
 </body>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/js/bootstrap.bundle.min.js" integrity="sha384-j1CDi7MgGQ12Z7Qab0qlWQ/Qqz24Gc6BM0thvEMVjHnfYGF0rmFCozFSxQBxwHKO" crossorigin="anonymous"></script>
