@@ -31,7 +31,11 @@
                     <input type="number" value='<%= customer_id %>' readonly min="0" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="customer_id" readonly>
                   </div>
                 <div class="mb-3">
-                    <p class="text-[2rem] font-bold m-[2rem] text-green-500">The amount has been paid successfully</p>
+                  <% if (!isNaN(total)){ %>
+                    <p class="text-[2rem] font-bold m-[2rem] text-green-500">The amount has been paid successfully that is = <%= total %></p>
+                    <% } else{ %>
+                      <p class="text-[2rem] font-bold m-[2rem] text-green-500">The amount has been paid successfully.</p>
+                    <% } %>  
                 </div>
             </div>
         </form>
