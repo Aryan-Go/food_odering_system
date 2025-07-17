@@ -107,16 +107,7 @@ export const render_signup = async(req, res) => {
   
 };
 
-// export const signup_addf = async (req, res) => {
-//   // console.log(username, email, password, password2, role);
-//   // console.log(signup_nullity_check(username, email, password, role))
-//   try {
-    
-//   } catch (error) {
-//     // const e = "There has been some problem with sign up please che"
-//     res.render("error_page.ejs" , {error})
-//   }
-// }
+
 
 export const render_login = async (req, res) => {
   const { email, password } = req.query;
@@ -258,18 +249,18 @@ export const food_items_addedf = async (req, res) => {
     await add_order_table(customer_id, "left", chef_id);
     console.log("Data has been added successfully inside the order table");
     let order_id;
-    for (let i = 0; i < quant.length ; i++){
-      if (quant[i] != 0) {
-        order_id = await find_order_id(customer_id, chef_id);
-        console.log(order_id);
-        await add_ordered_items(food_id[i], quant[i], special_instructions[i], order_id);
-      }
-      else {
-        console.log("It was a 0");
-      }
+      for (let i = 0; i < quant.length ; i++){
+        if (quant[i] != 0) {
+          order_id = await find_order_id(customer_id, chef_id);
+          console.log(order_id);
+          await add_ordered_items(food_id[i], quant[i], special_instructions[i], order_id);
+          await add_payment_table(total_price, order_id, customer_id);
+          res.redirect(`/waiting_page?order_id=${order_id}`)
+        }
+        else {
+          console.log("It was a 0");
+        }
     }
-    await add_payment_table(total_price, order_id, customer_id);
-    res.redirect(`/waiting_page?order_id=${order_id}`)
   }
 }
 
