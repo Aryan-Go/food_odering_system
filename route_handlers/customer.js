@@ -11,7 +11,6 @@ import {
 } from "../middlewares/admin.js";
 
 import {
-  signup_nullity_check,
   validate_email,
 } from "../middlewares/user_side.js";
 
@@ -40,8 +39,13 @@ import jwt from "jsonwebtoken";
 
 
 
-export const render_signup = (req, res) => {
-  res.render("signup.ejs");
+export const render_signup = async(req, res) => {
+  const token = req.cookies.token;
+  try {
+    res.redirect("/auth_reidrect");
+  } catch(err) {
+    res.render("signup.ejs");
+  }
 };
 
 export const signup_addf = async (req, res) => {
@@ -52,8 +56,7 @@ export const signup_addf = async (req, res) => {
     if (signup_nullity_check(username, email, password, role) == false) {
       if (validate_email(email)) {
         if (await check_same_email(email)) {
-          const error =
-            "You are already signed in, go to login page";
+          const error = " Email already exists, please log in";
           res.render("signup_error.ejs", {
             error,
             username,
@@ -100,12 +103,13 @@ export const signup_addf = async (req, res) => {
   }
 }
 
-export const render_login = (req, res) => {
-  res.render("login.ejs");
-};
-
-export const login_addf = async (req, res) => {
-  const { email, password } = req.body;
+export const render_login = async (req, res) => {
+  const { email, password } = req.query;
+  if (password == undefined || email == undefined) {
+    res.render("login.ejs");
+  }
+  else {
+    const { email, password } = req.query;
   console.log(email);
   console.log(password);
   try {
@@ -127,7 +131,7 @@ export const login_addf = async (req, res) => {
             res.redirect("/auth_reidrect");
           } else {
             const error =
-              "The password is not matching our database, please check once";
+              "Invalid Credentials. Please check";
             res.render("login_error.ejs", { error, email, password });
           }
         });
@@ -141,38 +145,48 @@ export const login_addf = async (req, res) => {
     } catch (error) {
       res.render("login_error.ejs", { error,email,password });
       }
-}
+  }
+};
+
+// export const login_addf = async (req, res) => {
+  
+// }
 
 export const logoutf = (req, res) => {
-  res.clearCookie("jwt", { httpOnly: true });
+
   console.log("Person has been logged out successfully");
   res.redirect("/login");
 };
 
-export const auth_redirectf =  async (req, res) => {
-  console.log("I am in");
+export const auth_redirectf = async (req, res) => {
+  try {
+    console.log("I am in");
     const token = req.cookies.token;
     console.log("token in auth redirect = " + token)
-  const payload = jwt.verify(token, secret);
-  console.log(payload);
-  if (payload.role == "chef") {
-    res.redirect("/chef");
-  } else if (payload.role == "customer") {
-    const customer_id = await find_customer_id(payload.email);
-    const payment_status = await get_payment_status(customer_id);
-    if (payment_status.length > 0) {
-      res.redirect(`/payment?customer_id=${customer_id}`);
+    const payload = jwt.verify(token, secret);
+    console.log(payload);
+    if (payload.role == "chef") {
+      res.redirect("/chef");
+    } else if (payload.role == "customer") {
+      const customer_id = await find_customer_id(payload.email);
+      const payment_status = await get_payment_status(customer_id);
+      if (payment_status.length > 0) {
+        res.redirect(`/payment?customer_id=${customer_id}`);
+      }
+      else {
+        res.redirect("/customer");
+      }
     }
+    else if (payload.role == "admin") {
+      res.redirect("/admin");
+    }
+      
     else {
-      res.redirect("/customer");
+      res.render("error_page.ejs", { error });
     }
   }
-  else if (payload.role == "admin") {
-    res.redirect("/admin");
-    }
-    
-  else {
-    res.render("error_page.ejs", { error });
+  catch (err) {
+    res.redirect("/")
   }
 }
 
@@ -276,3 +290,19 @@ export const render_waiting = async (req, res) => {
     res.render("error_page.ejs", { error });
   }
 }
+
+const signup_nullity_check = (username, email, password, role) => {
+  if (
+    username == null ||
+    username == undefined ||
+    email == null ||
+    email == undefined ||
+    password == null ||
+    password == undefined ||
+    role == null ||
+    role == undefined
+  ) {
+    return true;
+  }
+  return false;
+};

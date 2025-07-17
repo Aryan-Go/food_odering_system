@@ -30,14 +30,13 @@ import {
   render_signup,
   signup_addf,
   render_login,
-  login_addf,
   logoutf,
   auth_redirectf,
   render_customer,
   customer_cheff,
   render_menu,
   food_items_addedf,
-  render_waiting
+    render_waiting
 } from "./route_handlers/customer.js";
 
 import { render_admin,admin_working_f} from "./route_handlers/admin.js"
@@ -52,7 +51,7 @@ app.post("/signup_add", signup_addf);
 
 app.get("/login", render_login);
 
-app.post("/login_add", login_addf);
+// app.post("/login_add", login_addf);
 
 app.get("/logout", logoutf)
 
