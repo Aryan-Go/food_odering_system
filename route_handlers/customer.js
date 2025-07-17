@@ -41,22 +41,44 @@ import jwt from "jsonwebtoken";
 
 export const render_signup = async(req, res) => {
   const token = req.cookies.token;
-  try {
-    res.redirect("/auth_reidrect");
-  } catch(err) {
-    res.render("signup.ejs");
+  const { username, email, password, password2, role } = req.query;
+  if (email == undefined || username == undefined || password == undefined || password2 == undefined || role == undefined) {
+    res.render("signup.ejs")
   }
-};
-
-export const signup_addf = async (req, res) => {
-  const { username, email, password, password2, role } = req.body;
-  // console.log(username, email, password, password2, role);
-  // console.log(signup_nullity_check(username, email, password, role))
-  try {
-    if (signup_nullity_check(username, email, password, role) == false) {
-      if (validate_email(email)) {
-        if (await check_same_email(email)) {
-          const error = " Email already exists, please log in";
+  else {
+    try {
+      if (signup_nullity_check(username, email, password, role) == false) {
+        if (validate_email(email)) {
+          if (await check_same_email(email)) {
+            const error = " Email already exists, please log in";
+            res.render("signup_error.ejs", {
+              error,
+              username,
+              email,
+              password,
+              password2,
+              role,
+            });
+          } else {
+            if (password == password2) {
+              const hash = await bcrypt.hash(password, 10);
+              add_data(username, role, hash, email);
+              res.redirect("/login");
+            } else {
+              const error =
+                "Your password and confirm password were not a match please signup again";
+              res.render("signup_error.ejs", {
+                error,
+                username,
+                email,
+                password,
+                password2,
+                role,
+              });
+            }
+          }
+        } else {
+          const error = "Your email id is not valid";
           res.render("signup_error.ejs", {
             error,
             username,
@@ -66,42 +88,35 @@ export const signup_addf = async (req, res) => {
             role,
           });
         }
-        else {
-          if (password == password2) {
-            const hash = await bcrypt.hash(password, 10);
-            add_data(username, role, hash, email);
-            res.redirect("/login");
-          } else {
-            const error =
-              "Your password and confirm password were not a match please signup again";
-            res.render("signup_error.ejs", {
-              error,
-              username,
-              email,
-              password,
-              password2,
-              role,
-            });
-          }
-        }
-       
+      } else {
+        const error =
+          "One or many of the required fields while signing up were empty. Please fill all of them";
+        res.render("signup_error.ejs", {
+          error,
+          username,
+          email,
+          password,
+          password2,
+          role,
+        });
       }
-      else {
-        const error = "Your email id is not valid"
-        res.render("signup_error.ejs" , {error,username,email,password,password2,role})
-      }
-      
+    } catch (err) {
+      res.render("error_page.ejs", { err });
     }
-    else {
-      const error =
-        "One or many of the required fields while signing up were empty. Please fill all of them";
-      res.render("signup_error.ejs", {error,username,email,password,password2,role,});
-    }
-  } catch (error) {
-    // const e = "There has been some problem with sign up please che"
-    res.render("error_page.ejs" , {error})
   }
-}
+  
+};
+
+// export const signup_addf = async (req, res) => {
+//   // console.log(username, email, password, password2, role);
+//   // console.log(signup_nullity_check(username, email, password, role))
+//   try {
+    
+//   } catch (error) {
+//     // const e = "There has been some problem with sign up please che"
+//     res.render("error_page.ejs" , {error})
+//   }
+// }
 
 export const render_login = async (req, res) => {
   const { email, password } = req.query;

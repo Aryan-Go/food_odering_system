@@ -28,7 +28,6 @@ app.set("view engine", "ejs");
 
 import {
   render_signup,
-  signup_addf,
   render_login,
   logoutf,
   auth_redirectf,
@@ -47,7 +46,7 @@ import { render_payment,payment_donef,payment_done_admin_f } from "./route_handl
 
 app.get("/", render_signup)
 
-app.post("/signup_add", signup_addf);
+// app.post("/signup_add", signup_addf);
 
 app.get("/login", render_login);
 
