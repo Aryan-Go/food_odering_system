@@ -168,7 +168,12 @@ export const render_login = async (req, res) => {
 // }
 
 export const logoutf = (req, res) => {
-
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true, 
+    sameSite: "lax", 
+    path: "/login", 
+  });
   console.log("Person has been logged out successfully");
   res.redirect("/login");
 };
