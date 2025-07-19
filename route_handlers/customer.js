@@ -290,21 +290,28 @@ export const food_items_addedf = async (req, res) => {
       const error = "Please put some quantity of food"
       res.render("error_page.ejs" , {error})
     }
-    await add_order_table(customer_id, "left", chef_id);
-    console.log("Data has been added successfully inside the order table");
-    let order_id;
-      for (let i = 0; i < quant.length ; i++){
+    else {
+      await add_order_table(customer_id, "left", chef_id);
+      console.log("Data has been added successfully inside the order table");
+      let order_id;
+      for (let i = 0; i < quant.length; i++) {
         if (quant[i] != 0) {
           order_id = await find_order_id(customer_id, chef_id);
           console.log(order_id);
-          await add_ordered_items(food_id[i], quant[i], special_instructions[i], order_id);
+          await add_ordered_items(
+            food_id[i],
+            quant[i],
+            special_instructions[i],
+            order_id
+          );
           await add_payment_table(total_price, order_id, customer_id);
-          res.redirect(`/waiting_page?order_id=${order_id}`)
-        }
-        else {
+          res.redirect(`/waiting_page?order_id=${order_id}`);
+        } else {
           console.log("It was a 0");
         }
+      }
     }
+    
   }
 }
 
