@@ -19,7 +19,7 @@
         </div>
     </div>
     </nav>
-    <form action="/food_items_added" method="post" class="text-center">
+    <form id="myForm" action="/food_items_added" method="post" class="text-center">
         <div class="h-full w-[100vw] bg-[url(/image/menu_back.webp)] bg-no-repeat bg-size-[length:100%_100%] text-center flex flex-col justify-center items-center gap-2rem text-center"">
             <h1 class="py-[4rem]">Menu</h1>
             <h2 class=" m-[4rem] px-[10rem]">Starters</h2>
@@ -41,7 +41,7 @@
                             <td class="text-xl font-bold mx-[2rem]">Rs<%= starter.price %></td>
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Quanity</label><br>
-                                <input type="number" value=0 name="quant"  min="0" class="quant w-[5rem] text-center border-dashed border-black">
+                                <input type="number" value=0 name="quant" onkeyup=enforceMinMax(this) min="0" class="quant invalid:border-pink-500 w-[5rem] text-center border-dashed border-black">
                                 <input type="number" value="<%= starter.food_id %>" name="food_id" class="food_id" hidden>
                             </td>
                             <td class="text-xl font-bold mx-[2rem]">
@@ -73,7 +73,7 @@
                             <td class="text-xl font-bold mx-[2rem]">Rs<%= main.price %></td>
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Quanity</label>
-                                <input type="number" value=0 name="quant" min="0" class="quant w-[5rem] text-center border-dashed border-black">
+                                <input type="number" value=0 name="quant" min="0" onkeyup=enforceMinMax(this) class="quant invalid:border-pink-500 w-[5rem] text-center border-dashed border-black">
                                 <input type="number" value="<%= main.food_id %>" name="food_id" class="food_id" hidden>
                             </td>
                             <td class="text-xl font-bold mx-[2rem]">
@@ -105,7 +105,7 @@
                             <td class="text-xl font-bold mx-[2rem]">Rs<%= dess.price %></td>
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Quanity</label>
-                                <input type="number" value=0 name="quant" min="0" class="quant w-[5rem] text-center border-dashed border-black">
+                                <input type="number" value=0 name="quant" min="0" onkeyup=enforceMinMax(this) class="quant invalid:border-pink-500 w-[5rem] text-center border-dashed border-black">
                                 <input type="number" value= "<%= dess.food_id %>"name="food_id" class="food_id" hidden>
                             </td>
                             <td class="text-xl font-bold mx-[2rem]">
@@ -120,5 +120,14 @@
             <button type="submit" class="text-center text-4xl font-bold w-[30%] bg-[#F4D871] px-[2rem] py-[0.5rem] mb-30">Submit your order</button>
         </div>
     </form>
+    <script>
+        function enforceMinMax(el) {
+            if (el.value != "") {
+              if (parseInt(el.value) < parseInt(el.min)) {
+                el.value = el.min;
+               }
+              }
+}
+    </script>
 </body>
 </html>l
