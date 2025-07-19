@@ -41,35 +41,70 @@ import jwt from "jsonwebtoken";
 
 export const render_signup = async(req, res) => {
   const token = req.cookies.token;
-  const { username, email, password, password2, role } = req.query;
-  if (email == undefined || username == undefined || password == undefined || password2 == undefined || role == undefined) {
-    res.render("signup.ejs")
+  if (token) {
+    const payload = jwt.verify(token, secret);
+    if (payload.role == "chef") {
+      res.redirect("/chef");
+    } else if (payload.role == "customer") {
+      const customer_id = await find_customer_id(payload.email);
+      const payment_status = await get_payment_status(customer_id);
+      if (payment_status.length > 0) {
+        res.redirect(`/payment?customer_id=${customer_id}`);
+      } else {
+        res.redirect("/customer");
+      }
+    } else if (payload.role == "admin") {
+      res.redirect("/admin");
+    } else {
+      res.render("error_page.ejs", { error });
+    }
   }
   else {
-    try {
-      if (signup_nullity_check(username, email, password, role) == false) {
-        if (validate_email(email)) {
-          if (await check_same_email(email)) {
-            const error = " Email already exists, please log in";
-            res.render("signup_error.ejs", {
-              error,
-              username,
-              email,
-              password,
-              password2,
-              role,
-            });
-          }
-          else {
-            if (password == password2) {
-              let points = checkStrength(password)
-              if (points > 4) {
-                const hash = await bcrypt.hash(password, 10);
-                add_data(username, role, hash, email);
-                res.redirect("/login");
-              }
-              else {
-                const error = "The password is not strong enough. Atleast 8 characters with upper case , lower case , special charaacters and digits"
+    const { username, email, password, password2, role } = req.query;
+    if (
+      email == undefined ||
+      username == undefined ||
+      password == undefined ||
+      password2 == undefined ||
+      role == undefined
+    ) {
+      res.render("signup.ejs");
+    } else {
+      try {
+        if (signup_nullity_check(username, email, password, role) == false) {
+          if (validate_email(email)) {
+            if (await check_same_email(email)) {
+              const error = " Email already exists, please log in";
+              res.render("signup_error.ejs", {
+                error,
+                username,
+                email,
+                password,
+                password2,
+                role,
+              });
+            } else {
+              if (password == password2) {
+                let points = checkStrength(password);
+                if (points > 4) {
+                  const hash = await bcrypt.hash(password, 10);
+                  add_data(username, role, hash, email);
+                  res.redirect("/login");
+                } else {
+                  const error =
+                    "The password is not strong enough. Atleast 8 characters with upper case , lower case , special charaacters and digits";
+                  res.render("signup_error.ejs", {
+                    error,
+                    username,
+                    email,
+                    password,
+                    password2,
+                    role,
+                  });
+                }
+              } else {
+                const error =
+                  "Your password and confirm password were not a match please signup again";
                 res.render("signup_error.ejs", {
                   error,
                   username,
@@ -79,21 +114,21 @@ export const render_signup = async(req, res) => {
                   role,
                 });
               }
-            } else {
-              const error =
-                "Your password and confirm password were not a match please signup again";
-              res.render("signup_error.ejs", {
-                error,
-                username,
-                email,
-                password,
-                password2,
-                role,
-              });
             }
+          } else {
+            const error = "Your email id is not valid";
+            res.render("signup_error.ejs", {
+              error,
+              username,
+              email,
+              password,
+              password2,
+              role,
+            });
           }
         } else {
-          const error = "Your email id is not valid";
+          const error =
+            "One or many of the required fields while signing up were empty. Please fill all of them";
           res.render("signup_error.ejs", {
             error,
             username,
@@ -103,23 +138,11 @@ export const render_signup = async(req, res) => {
             role,
           });
         }
-      } else {
-        const error =
-          "One or many of the required fields while signing up were empty. Please fill all of them";
-        res.render("signup_error.ejs", {
-          error,
-          username,
-          email,
-          password,
-          password2,
-          role,
-        });
+      } catch (err) {
+        res.render("error_page.ejs", { err });
       }
-    } catch (err) {
-      res.render("error_page.ejs", { err });
     }
   }
-  
 };
 
 
@@ -174,12 +197,8 @@ export const render_login = async (req, res) => {
 // }
 
 export const logoutf = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: true, 
-    sameSite: "lax", 
-    path: "/login", 
-  });
+  res.clearCookie("token");
+  console.log(req.cookies);
   console.log("Person has been logged out successfully");
   res.redirect("/login");
 };
