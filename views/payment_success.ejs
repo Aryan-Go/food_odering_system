@@ -15,7 +15,7 @@
           <div class="flex justify-around items-center w-[30%]" role="search">
             <a class="navbar-brand mb-0 h1 text-gray-600 no-underline" href="/menu">Menu</a>
             <a class="navbar-brand mb-0 h1 text-gray-600 no-underline" href="/customer">Home</a>
-            <a class="navbar-brand mb-0 h1 text-gray-600 no-underline" href="/customer_chef">Become a chef ??</a>
+            <form method="GET" action="/customer_chef"><a class="navbar-brand mb-0 h1 text-gray-600 no-underline" href="/customer_chef"><button onClick="confirmUser()" type="submit" class="btn btn-primary">Become a Chef??</button></a></Form>
             <a href="/logout"><button type="button" class="btn btn-primary">Logout</button></a>
           </div>
         </div>
@@ -43,5 +43,10 @@
                 </div>
             </div>
         </form>
+         <script>
+        const confirmUser = () => {
+            return confirm("Are your sure you want to become a chef ??")
+        }
+    </script>
 </body>
 </html>

@@ -21,9 +21,7 @@
             <input required readonly value="<%= password %>"  type="password" class="form-control" id="exampleInputPassword1" placeholder="Password" name="password">
             <label for="exampleInputPassword2">Confirm Password</label>
             <input required readonly value="<%= password2 %>"  type="password" class="form-control" id="exampleInputPassword2" placeholder="Confirm Password" name="password2">
-            <label for="role">Who are you??</label><br>
-            <input required readonly value="<%= role %>"  type="checkbox" class="form-check-input" id="exampleCheck1" name="role" value="customer">
-            <label class="form-check-label" for="exampleCheck1">Customer</label><br>
+             <input hidden required type="text" class="form-check-input" id="exampleCheck1" name="role" value="customer">
             <div class="flex flex-row justify-around w-[30rem] m-[1rem]">
                 <button type="submit" class="btn btn-primary">Go back to sign up page</button>
                 <a href="/login" class="btn btn-primary"><button type="button">Go back to login page</button></a>
