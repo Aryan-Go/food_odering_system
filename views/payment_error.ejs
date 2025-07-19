@@ -13,6 +13,7 @@
         <div class="container-fluid">
           <a class="navbar-brand"><img class="w-[5rem]" src="/image/logo-removebg.png" alt="logo"></a>
           <div class="flex justify-around items-center w-[20%]" role="search">
+            <button onclick="goBack()" type="button" class="btn btn-primary">Go back</button>
           </div>
         </div>
     </nav>
@@ -35,5 +36,10 @@
                 </div>
             </div>
         </form>
+      <script>
+        const goBack = () => {
+            window.history.back();
+        }
+    </script>
 </body>
 </html>

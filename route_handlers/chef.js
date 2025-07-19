@@ -65,16 +65,17 @@ export const render_order = async (req, res) => {
       data = await get_ordered_items(order_id);
       console.log(data);
       const check = await status_order_id(order_id);
+      let food_name = [];
+      for (let i = 0; i < data.length; i++) {
+        const [data2] = await get_food_item_name(data[i].food_id);
+        console.log("This is data2.food_name", data2.food_name);
+        food_name.push(data2.food_name);
+      }
+      res.render("order.ejs", { data, food_name });
     } else {
       data = [];
+      res.render("empty_order.ejs")
     }
-    let food_name = [];
-    for (let i = 0; i < data.length; i++) {
-      const [data2] = await get_food_item_name(data[i].food_id);
-      console.log("This is data2.food_name", data2.food_name);
-      food_name.push(data2.food_name);
-    }
-    res.render("order.ejs", { data, food_name });
   }
 };
 

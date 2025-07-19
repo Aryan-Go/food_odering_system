@@ -59,11 +59,26 @@ export const render_signup = async(req, res) => {
               password2,
               role,
             });
-          } else {
+          }
+          else {
             if (password == password2) {
-              const hash = await bcrypt.hash(password, 10);
-              add_data(username, role, hash, email);
-              res.redirect("/login");
+              let points = checkStrength(password)
+              if (points > 4) {
+                const hash = await bcrypt.hash(password, 10);
+                add_data(username, role, hash, email);
+                res.redirect("/login");
+              }
+              else {
+                const error = "The password is not strong enough. Atleast 8 characters with upper case , lower case , special charaacters and digits"
+                res.render("signup_error.ejs", {
+                  error,
+                  username,
+                  email,
+                  password,
+                  password2,
+                  role,
+                });
+              }
             } else {
               const error =
                 "Your password and confirm password were not a match please signup again";
@@ -317,3 +332,28 @@ const signup_nullity_check = (username, email, password, role) => {
   }
   return false;
 };
+
+const checkStrength = (enteredPassword) => {
+  var length = /(.{8,})/;
+  var upperCase = /(.*[A-Z])/;
+  var lowerCase = /(.*[a-z])/;
+  var digit = /(.*[0-9].*[0-9])/;
+  var specialChar = /([^A-Za-z0-9])/;
+  var points = 0;
+  if (length.test(enteredPassword)) {
+    points++;
+  }
+  if (upperCase.test(enteredPassword)) {
+    points++;
+  }
+  if (lowerCase.test(enteredPassword)) {
+    points++;
+  }
+  if (digit.test(enteredPassword)) {
+    points++;
+  }
+  if (specialChar.test(enteredPassword)) {
+    points++;
+  }
+  return points;
+}

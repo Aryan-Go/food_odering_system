@@ -8,24 +8,20 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body>
+<body class="text-center">
     <nav class="navbar sticky-top bg-body-tertiary" style="background-color: #e3f2fd;" data-bs-theme="light">
         <div class="container-fluid">
           <a class="navbar-brand"><img class="w-[5rem]" src="/image/logo-removebg.png" alt="logo"></a>
           <div class="flex justify-around items-center w-[20%]" role="search">
-            <button onclick="goBack()" type="button" class="btn btn-primary">Go back</button>
+            <a class="navbar-brand mb-0 h1 text-gray-600 no-underline" href="/order">Order</a>
+            <a class="navbar-brand mb-0 h1 text-gray-600 no-underline" href="/chef">Home</a>
+            <a href="/logout"><button type="button" class="btn btn-primary">Logout</button></a>
           </div>
         </div>
     </nav>
-    <div>
-        <h1>There has been some error</h1>
-        <!-- <h2>Description ----> </h2>
-        <p class="text-red-500 text-[3rem]"><%= error %></p>
-    </div>
-    <script>
-        const goBack = () => {
-            window.history.back();
-        }
-    </script>
+        <div class="h-[100vh] w-[100vw] bg-[url(/image/menu_back.webp)] bg-no-repeat bg-size-[length:100%_100%] flex flex-col items-center gap-2rem text-center"">
+            <h1 class="py-[4rem]">Order</h1>
+            <h1 class="py-[4rem] text-danger">No orders are there at this moment</h1>
+        </div>
 </body>
 </html>
