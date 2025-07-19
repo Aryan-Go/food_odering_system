@@ -280,6 +280,16 @@ export const food_items_addedf = async (req, res) => {
     res.render("error_page.ejs" , {error})
   }
   else {
+    let count = 0;
+    for (let i = 0; i < quant.length; i++){
+      if (quant[i] == 0) {
+        count++;
+      }
+    }
+    if (count == quant.length) {
+      const error = "Please put some quantity of food"
+      res.render("error_page.ejs" , {error})
+    }
     await add_order_table(customer_id, "left", chef_id);
     console.log("Data has been added successfully inside the order table");
     let order_id;

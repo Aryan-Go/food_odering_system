@@ -12,11 +12,9 @@ export const auth_checker = async (req, res, next) => {
     console.log(payload);
     req.user = payload;
     next();
-  } catch (error) {
+  } catch (err) {
+    const error = "You are not authorised. Please login once more";
     console.log(error);
-    res.json({
-      success: false,
-      message: "You are not authorised. Please login once more",
-    });
+   res.render("error_page.ejs" , {error})
   }
 };

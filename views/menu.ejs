@@ -41,7 +41,7 @@
                             <td class="text-xl font-bold mx-[2rem]">Rs<%= starter.price %></td>
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Quanity</label><br>
-                                <input type="number" value=0 name="quant" onkeyup=enforceMinMax(this) min="0" class="quant invalid:border-pink-500 w-[5rem] text-center border-dashed border-black">
+                                <input pattern="^[1-9][0-9]*$" required type="number" value=0 name="quant" onkeyup=enforceMinMax(this) min="0" class="quant user-invalid:border-red-500 w-[5rem] text-center border-dashed border-black">
                                 <input type="number" value="<%= starter.food_id %>" name="food_id" class="food_id" hidden>
                             </td>
                             <td class="text-xl font-bold mx-[2rem]">
@@ -73,7 +73,7 @@
                             <td class="text-xl font-bold mx-[2rem]">Rs<%= main.price %></td>
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Quanity</label>
-                                <input type="number" value=0 name="quant" min="0" onkeyup=enforceMinMax(this) class="quant invalid:border-pink-500 w-[5rem] text-center border-dashed border-black">
+                                <input pattern="^[1-9][0-9]*$" required type="number" value=0 name="quant" min="0" onkeyup=enforceMinMax(this) class="quant user-invalid:border-red-500 w-[5rem] text-center border-dashed border-black">
                                 <input type="number" value="<%= main.food_id %>" name="food_id" class="food_id" hidden>
                             </td>
                             <td class="text-xl font-bold mx-[2rem]">
@@ -105,7 +105,7 @@
                             <td class="text-xl font-bold mx-[2rem]">Rs<%= dess.price %></td>
                             <td class="text-xl font-bold mx-[2rem]">
                                 <label for="quant">Quanity</label>
-                                <input type="number" value=0 name="quant" min="0" onkeyup=enforceMinMax(this) class="quant invalid:border-pink-500 w-[5rem] text-center border-dashed border-black">
+                                <input pattern="^[1-9][0-9]*$" required type="number" value=0 name="quant" min="0" onkeyup=enforceMinMax(this) class="quant user-invalid:border-red-500 w-[5rem] text-center border-dashed border-black">
                                 <input type="number" value= "<%= dess.food_id %>"name="food_id" class="food_id" hidden>
                             </td>
                             <td class="text-xl font-bold mx-[2rem]">
@@ -126,8 +126,11 @@
               if (parseInt(el.value) < parseInt(el.min)) {
                 el.value = el.min;
                }
+               else if(!isNumber(el.value)){
+                el.value=el.min;
               }
-}
+            }
+        }
     </script>
 </body>
-</html>l
+</html>
