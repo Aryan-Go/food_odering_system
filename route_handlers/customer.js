@@ -221,19 +221,12 @@ export const render_customer = (req, res) => {
 };
 
 export const customer_cheff = async (req, res) => {
-  const tf = req.body
-  console.log("This is he query" , req.query)
-  if (tf){
     const token = req.cookies.token;
     console.log("token in auth redirect = " + token);
     const payload = jwt.verify(token, secret);
     const customer_id = await find_customer_id(payload.email);
     await request_customer_chef(customer_id);
     res.render("customer_chef.ejs");
-  }
-  else {
-    res.redirect("/customer")
-  }
 }
 
 export const render_menu = async (req, res) => {
