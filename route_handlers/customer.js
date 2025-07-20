@@ -222,6 +222,14 @@ export const auth_redirectf = async (req, res) => {
 
 let bcb = false
 export const render_customer = (req, res) => {
+  const token = req.cookies.token;
+  const payload = jwt.verify(token, secret);
+  if (payload.role == "admin") {
+    bcb=true
+  }
+  else {
+    bcb=false
+  }
   res.render("customer.ejs" , {bcb});
 };
 
