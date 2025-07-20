@@ -35,7 +35,8 @@ import {
   customer_cheff,
   render_menu,
   food_items_addedf,
-    render_waiting
+    render_waiting,
+    signup_page
 } from "./route_handlers/customer.js";
 
 import { render_admin,admin_working_f} from "./route_handlers/admin.js"
@@ -45,6 +46,7 @@ import { render_chef,render_order,complete_orderf } from "./route_handlers/chef.
 import { render_payment,payment_donef,payment_done_admin_f } from "./route_handlers/payment.js";
 
 app.get("/", render_signup)
+app.get("/signup" , signup_page)
 
 // app.post("/signup_add", signup_addf);
 

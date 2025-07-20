@@ -60,51 +60,44 @@ export const render_signup = async(req, res) => {
     }
   }
   else {
-    const { username, email, password, password2, role } = req.query;
-    if (
-      email == undefined ||
-      username == undefined ||
-      password == undefined ||
-      password2 == undefined ||
-      role == undefined
-    ) {
-      res.render("signup.ejs");
-    } else {
-      try {
-        if (signup_nullity_check(username, email, password, role) == false) {
-          if (validate_email(email)) {
-            if (await check_same_email(email)) {
-              const error = " Email already exists, please log in";
-              res.render("signup_error.ejs", {
-                error,
-                username,
-                email,
-                password,
-                password2,
-                role,
-              });
-            } else {
-              if (password == password2) {
-                let points = checkStrength(password);
-                if (points > 4) {
-                  const hash = await bcrypt.hash(password, 10);
-                  add_data(username, role, hash, email);
-                  res.redirect("/login");
-                } else {
-                  const error =
-                    "The password is not strong enough. Atleast 8 characters with upper case , lower case , special charaacters and digits";
-                  res.render("signup_error.ejs", {
-                    error,
-                    username,
-                    email,
-                    password,
-                    password2,
-                    role,
-                  });
-                }
+    res.redirect("/signup")
+  }
+};
+
+export const signup_page = async (req, res) => {
+  const { username, email, password, password2, role } = req.query;
+  if (
+    email == undefined ||
+    username == undefined ||
+    password == undefined ||
+    password2 == undefined ||
+    role == undefined
+  ) {
+    res.render("signup.ejs");
+  } else {
+    try {
+      if (signup_nullity_check(username, email, password, role) == false) {
+        if (validate_email(email)) {
+          if (await check_same_email(email)) {
+            const error = " Email already exists, please log in";
+            res.render("signup_error.ejs", {
+              error,
+              username,
+              email,
+              password,
+              password2,
+              role,
+            });
+          } else {
+            if (password == password2) {
+              let points = checkStrength(password);
+              if (points > 4) {
+                const hash = await bcrypt.hash(password, 10);
+                add_data(username, role, hash, email);
+                res.redirect("/login");
               } else {
                 const error =
-                  "Your password and confirm password were not a match please signup again";
+                  "The password is not strong enough. Atleast 8 characters with upper case , lower case , special charaacters and digits";
                 res.render("signup_error.ejs", {
                   error,
                   username,
@@ -114,21 +107,21 @@ export const render_signup = async(req, res) => {
                   role,
                 });
               }
+            } else {
+              const error =
+                "Your password and confirm password were not a match please signup again";
+              res.render("signup_error.ejs", {
+                error,
+                username,
+                email,
+                password,
+                password2,
+                role,
+              });
             }
-          } else {
-            const error = "Your email id is not valid";
-            res.render("signup_error.ejs", {
-              error,
-              username,
-              email,
-              password,
-              password2,
-              role,
-            });
           }
         } else {
-          const error =
-            "One or many of the required fields while signing up were empty. Please fill all of them";
+          const error = "Your email id is not valid";
           res.render("signup_error.ejs", {
             error,
             username,
@@ -138,14 +131,23 @@ export const render_signup = async(req, res) => {
             role,
           });
         }
-      } catch (err) {
-        res.render("error_page.ejs", { err });
+      } else {
+        const error =
+          "One or many of the required fields while signing up were empty. Please fill all of them";
+        res.render("signup_error.ejs", {
+          error,
+          username,
+          email,
+          password,
+          password2,
+          role,
+        });
       }
+    } catch (err) {
+      res.render("error_page.ejs", { err });
     }
   }
-};
-
-
+}
 
 export const render_login = async (req, res) => {
   const { email, password } = req.query;
@@ -325,20 +327,23 @@ export const render_waiting = async (req, res) => {
     const {order_id} = req.query;
     const num_order_id = parseInt(order_id);
     console.log(num_order_id);
-    const data = await get_ordered_items(num_order_id);
-    console.log(data)
-    if (data.length > 0) {
+    const ordered_itens = await get_ordered_items(num_order_id);
+    console.log(ordered_itens);
+    if (ordered_itens.length > 0) {
       let food_name = [];
-      for (let i = 0; i < data.length; i++) {
-        const [data2] = await get_food_item_name(data[i].food_id);
-        console.log("This is data2.food_name" , data2.food_name);
-        food_name.push(data2.food_name);
+      for (let i = 0; i < ordered_itens.length; i++) {
+        const [food_Name] = await get_food_item_name(ordered_itens[i].food_id);
+        console.log("This is data2.food_name", food_Name.food_name);
+        food_name.push(food_Name.food_name);
+        console.log(food_name);
+        console.log("Just before render = " + num_order_id);
+        res.render("waiting_page.ejs", {
+          food_name,
+          ordered_itens,
+          num_order_id,
+        });
       }
-      console.log(food_name)
-      console.log("Just before render = " + num_order_id);
-      res.render("waiting_page.ejs", { food_name,data ,num_order_id});
-    }
-    else {
+    } else {
       const token = req.cookies.token;
       console.log("token in auth redirect = " + token);
       const payload = jwt.verify(token, secret);
@@ -346,7 +351,9 @@ export const render_waiting = async (req, res) => {
       console.log(customer_id);
       const { order_id } = req.query;
       const num_order_id = parseInt(order_id);
-      res.redirect(`/payment?order_id=${num_order_id}`);
+      res.redirect(
+        `/payment?order_id=${num_order_id}&customer_id=${customer_id}`
+      );
     }
   } catch (error) {
     res.render("error_page.ejs", { error });

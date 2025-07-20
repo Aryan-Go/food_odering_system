@@ -29,21 +29,21 @@ export const render_order = async (req, res) => {
   if (payload.role == "admin") {
     const order_id = req.query.order_id;
     console.log(order_id);
-    const data = await get_ordered_items(order_id);
-    console.log(data);
+    const ordered_items = await get_ordered_items(order_id);
+    console.log(ordered_items);
     const check = await status_order_id(order_id);
-    if (data.length > 0) {
+    if (ordered_items.length > 0) {
       let food_name = [];
-      for (let i = 0; i < data.length; i++) {
-        const [data2] = await get_food_item_name(data[i].food_id);
-        console.log("This is data2.food_name", data2.food_name);
-        food_name.push(data2.food_name);
+      for (let i = 0; i < ordered_items.length; i++) {
+        const [food_Name] = await get_food_item_name(ordered_items[i].food_id);
+        console.log("This is data2.food_name", food_Name.food_name);
+        food_name.push(food_Name.food_name);
       }
       console.log(food_name);
 
-      res.render("order.ejs", { food_name, data });
+      res.render("order.ejs", { food_name, ordered_items });
     } else {
-      if (data == null || data == undefined) {
+      if (ordered_items == null || ordered_items == undefined) {
         const error = "There is no such order";
         res.render("error_page.ejs", { error });
       } else {
@@ -52,28 +52,26 @@ export const render_order = async (req, res) => {
       }
     }
   } else {
-    const token = req.cookies.token;
-    const payload = jwt.verify(token, secret);
     const email = payload.email;
     console.log(email);
     const chef_data = await find_chef_id(email);
     console.log(chef_data[0].user_id);
     const order_id = await find_chef_orders(chef_data[0].user_id);
     console.log(order_id);
-    let data;
+    let ordered_items;
     if (order_id != -1) {
-      data = await get_ordered_items(order_id);
-      console.log(data);
+      ordered_items = await get_ordered_items(order_id);
+      console.log(ordered_items);
       const check = await status_order_id(order_id);
       let food_name = [];
-      for (let i = 0; i < data.length; i++) {
-        const [data2] = await get_food_item_name(data[i].food_id);
-        console.log("This is data2.food_name", data2.food_name);
-        food_name.push(data2.food_name);
+      for (let i = 0; i < ordered_items.length; i++) {
+        const [food_Name] = await get_food_item_name(ordered_items[i].food_id);
+        console.log("This is data2.food_name", food_Name.food_name);
+        food_name.push(food_Name.food_name);
       }
-      res.render("order.ejs", { data, food_name });
+      res.render("order.ejs", { ordered_items, food_name });
     } else {
-      data = [];
+      ordered_items = [];
       res.render("empty_order.ejs")
     }
   }

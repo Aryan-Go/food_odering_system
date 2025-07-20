@@ -24,7 +24,7 @@
         <form action="/admin_working" method="post">
             <label for="quant" class="px-[4rem] font-bold">Order_id</label>
             <select name="order_id">
-                <% data.forEach((data_row,index) => { %>
+                <% incomplete_food.forEach((data_row,index) => { %>
                     <option value="<%= data_row.order_id %>"><%= data_row.order_id %></option>
                 <% }) %>
             </select><br><br>
@@ -35,7 +35,7 @@
         <form action="/admin_working" method="post">
             <label for="quant" class="px-[4rem] font-bold">order_id</label>
             <select name="order_id_2">
-                <% data_2.forEach((data_row,index) => { %>
+                <% unpaid_food.forEach((data_row,index) => { %>
                     <option value="<%= data_row.order_id %>"><%= data_row.order_id %></option>
                 <% }) %>
             </select><br><br>

@@ -10,6 +10,7 @@ import {
   update_payment_table,
   get_payment_id,
   get_payment_table_2,
+  check_order_status
 } from "../database_queries/database.js";
 
 
@@ -20,10 +21,16 @@ export const render_payment = async (req, res) => {
   const payload = jwt.verify(token, secret);
   if (payload.role != "admin") {
     console.log("I am not a admin");
-    const customer_id = req.query.customer_id;
-    const data = await get_payment_table(customer_id);
-    console.log("The data for payment is = " + data);
-    res.render("payment.ejs", { data, customer_id });
+    const {order_id,customer_id} = req.query;
+    console.log(req.query);
+    const paymnet_data = await get_payment_table(customer_id);
+    if (check_order_status(customer_id,order_id)) {
+      console.log("The data for payment is = " + paymnet_data);
+      res.render("payment.ejs", { paymnet_data, customer_id });
+    }
+    else {
+      res.redirect("/waiting_page")
+    }
   }
   else {
     try {
@@ -34,12 +41,12 @@ export const render_payment = async (req, res) => {
       // 1. Firstly make functions to add and subtract sum of money that is required to make give the total d-print-table-cell - done
       // 2. Now make 2 functions to insert data inside the databse and get the data
       // 3. bring it to an ejs file
-      const data = await get_payment_table_2(num_order_id);
-      console.log("The data for payment is = " + data);
-      if (data.length > 0) {
-        const customer_id = data[0].customer_id;
+      const payment_data = await get_payment_table_2(num_order_id);
+      console.log("The data for payment is = " + payment_data);
+      if (payment_data.length > 0) {
+        const customer_id = payment_data[0].customer_id;
         console.log(customer_id);
-        res.render("payment_admin.ejs", { data,customer_id }); 
+        res.render("payment_admin.ejs", { payment_data,customer_id }); 
       }
       else {
         const error = "The order has already been paid or completed"

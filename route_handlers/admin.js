@@ -9,9 +9,9 @@ import {
 } from "../middlewares/admin.js";
 
 export const render_admin = async(req, res) => {
-  const data = await get_incomplete_food_id();
-  const data_2 = await get_unpaid_food_id();
-  res.render("admin.ejs" , {data,data_2,customer_chef});
+  const incomplete_food = await get_incomplete_food_id();
+  const unpaid_food = await get_unpaid_food_id();
+  res.render("admin.ejs" , {incomplete_food,unpaid_food,customer_chef});
 }
 
 export const admin_working_f = (req, res) => {

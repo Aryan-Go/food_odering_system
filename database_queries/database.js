@@ -361,3 +361,15 @@ export const convert_customer_chef = async (customer_id) => {
   await db.query(`UPDATE user SET role=? WHERE user_id=?;` , [role, customer_id])
   console.log("The role has been changes")
 }
+
+export const check_order_status = async (customer_id, order_id) => {
+  const order_status = "completed"
+  const data = await db.query(`SELECT * FROM order_table WHERE order_id = ? AND customer_id = ? AND food_status = ?;`, [order_id, customer_id, order_status])
+  console.log(data[0])
+  if (data[0] == null || data[0] == undefined) {
+    return false;
+  }
+  else {
+    return true;
+  }
+}
