@@ -79,11 +79,17 @@ export const render_order = async (req, res) => {
 
 export const complete_orderf = async (req, res) => {
   // res.send(req.body);
-  await complete_ordered_items(
-    req.body.order_id,
-    req.body.food_id,
-    req.body.completed
-  );
-  console.log("This order id has been turned to completed in ordered table");
-  res.redirect("/order");
+  if (req.body == null || req.body == undefined) {
+    const error = "There is no valid request for this page please go back and check once more"
+    res.render("error_page.ejs" , {error})
+  }
+  else {
+    await complete_ordered_items(
+      req.body.order_id,
+      req.body.food_id,
+      req.body.completed
+    );
+    console.log("This order id has been turned to completed in ordered table");
+    res.redirect("/order");
+  }
 };
