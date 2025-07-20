@@ -8,12 +8,23 @@ export const customer_home = async (req, res, next) => {
   }
 };
 
-export const customer_menu = async (req, res, next) => {
-  if (req.user.role == "customer") {
+export const customer_payment = async (req, res, next) => {
+  if (req.user.role == "customer" || req.user.role == "admin") {
     next();
   } else {
     const error =
       "You are not authorised to enter as this is a protected route and your are logged in as chef or admin";
+    res.render("error_page.ejs", { error });
+  }
+};
+
+
+export const customer_menu = async (req, res, next) => {
+  if (req.user.role == "customer" || req.user.role == "admin") {
+    next();
+  } else {
+    const error =
+      "You are not authorised to enter as this is a protected route and your are logged in as chef";
     res.render("error_page.ejs", { error });
   }
 };
@@ -23,29 +34,29 @@ export const chef_home = async (req, res, next) => {
     next();
   } else {
     const error =
-      "You are not authorised to enter as this is a protected route and your are logged in as customer or admin";
+      "You are not authorised to enter as this is a protected route and your are logged in as customer";
     res.render("error_page.ejs", { error });
     
   }
 };
 
 export const chef_order = async (req, res, next) => {
-  if (req.user.role == "chef") {
+  if (req.user.role == "chef" || req.user.role == "admin") {
     next();
   } else {
     const error =
-      "You are not authorised to enter as this is a protected route and your are logged in as customer or admin";
+      "You are not authorised to enter as this is a protected route and your are logged in as customer";
     res.render("error_page.ejs", { error });
     
   }
 };
 
 export const chef_complete_item = async (req, res, next) => {
-  if (req.user.role == "chef" ) {
+  if (req.user.role == "chef" || req.user.role == "admin") {
     next();
   } else {
     const error =
-      "You are not authorised to enter as this is a protected route and your are logged in as customer or admin";
+      "You are not authorised to enter as this is a protected route and your are logged in as customer";
     res.render("error_page.ejs", { error });
     
   }

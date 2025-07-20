@@ -22,6 +22,7 @@ import {
   chef_home,
   chef_order,
   chef_complete_item,
+  customer_payment
 } from "./middlewares/user_side.js";
 import {
   admin,
@@ -85,14 +86,14 @@ app.post("/food_items_added", food_items_addedf);
 
 app.get("/waiting_page", render_waiting);
 
-app.get("/payment", auth_checker, customer_home, render_payment);
+app.get("/payment", auth_checker, customer_payment, render_payment);
 
-app.post("/payment_done", auth_checker, customer_home, payment_donef);
+app.post("/payment_done", auth_checker, customer_payment, payment_donef);
 
 app.post(
   "/payment_done_admin",
   auth_checker,
-  customer_home,
+  customer_payment,
   payment_done_admin_f
 );
 
