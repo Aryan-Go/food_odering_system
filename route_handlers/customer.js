@@ -153,13 +153,9 @@ export const render_login = async (req, res) => {
   }
   else {
     const { email, password } = req.query;
-  console.log(email);
-  console.log(password);
   try {
       if (await check_email(email)) {
         const hash_password = await find_password(email);
-        console.log(hash_password);
-        console.log(password);
         await bcrypt.compare(password, hash_password, async (err, result) => {
           if (result == true) {
             const payload = {
@@ -169,7 +165,6 @@ export const render_login = async (req, res) => {
             const token = await jwt.sign(payload, secret, {
               expiresIn: 2 * 60 * 60,
             });
-            console.log(token);
             res.cookie("token", token);
             res.redirect("/auth_reidrect");
           } else {
@@ -191,24 +186,15 @@ export const render_login = async (req, res) => {
   }
 };
 
-// export const login_addf = async (req, res) => {
-  
-// }
-
 export const logoutf = (req, res) => {
   res.clearCookie("token");
-  console.log(req.cookies);
-  console.log("Person has been logged out successfully");
   res.redirect("/login");
 };
 
 export const auth_redirectf = async (req, res) => {
   try {
-    console.log("I am in");
     const token = req.cookies.token;
-    console.log("token in auth redirect = " + token)
     const payload = jwt.verify(token, secret);
-    console.log(payload);
     if (payload.role == "chef") {
       res.redirect("/chef");
     } else if (payload.role == "customer") {
@@ -240,7 +226,6 @@ export const render_customer = (req, res) => {
 
 export const customer_cheff = async (req, res) => {
     const token = req.cookies.token;
-    console.log("token in auth redirect = " + token);
     const payload = jwt.verify(token, secret);
     const customer_id = await find_customer_id(payload.email);
     await request_customer_chef(customer_id);
@@ -251,29 +236,18 @@ export const render_menu = async (req, res) => {
   const starters = await get_food_menu(1);
   const main_course = await get_food_menu(2);
   const dessert = await get_food_menu(3);
-  console.log(starters);
-  console.log(main_course);
-  console.log(dessert);
   res.render("menu.ejs" , {starters,main_course,dessert});
 }
 
 export const food_items_addedf = async (req, res) => {
   const quant = req.body.quant;
-  console.log(quant);
   const food_id = req.body.food_id;
-  console.log(food_id);
   const total_price = await total_payment(quant, food_id);
-  console.log("The total price that I am getting = " + total_price);
   const special_instructions = req.body.special_instructions;
-  // res.send(quant);
-  // 1. Add the data into the order table to generate order id
-  // 2. Then you now have the food id and the order id so now add all the food items into the ordered items table
   const token = req.cookies.token;
-  console.log("token in auth redirect = " + token);
   const payload = jwt.verify(token, secret);
   const customer_id = await find_customer_id(payload.email);
   const chef_id = await chef_id_free();
-  console.log("IN index.js = " + chef_id);
   if (chef_id == -1) {
     const error="No chef is available at this moment"
     res.render("error_page.ejs" , {error})
@@ -291,12 +265,10 @@ export const food_items_addedf = async (req, res) => {
     }
     else {
       await add_order_table(customer_id, "left", chef_id);
-      console.log("Data has been added successfully inside the order table");
       let order_id;
       for (let i = 0; i < quant.length; i++) {
         if (quant[i] != 0) {
           order_id = await find_order_id(customer_id, chef_id);
-          console.log(order_id);
           await add_ordered_items(
             food_id[i],
             quant[i],
@@ -305,8 +277,6 @@ export const food_items_addedf = async (req, res) => {
           );
           await add_payment_table(total_price, order_id, customer_id);
           res.redirect(`/waiting_page?order_id=${order_id}`);
-        } else {
-          console.log("It was a 0");
         }
       }
     }
@@ -317,23 +287,16 @@ export const food_items_addedf = async (req, res) => {
 export const render_waiting = async (req, res) => {
   try {
     const token = req.cookies.token;
-    console.log("token in auth redirect = " + token);
     const payload = jwt.verify(token, secret);
     const customer_id = await find_customer_id(payload.email);
-    console.log(customer_id);
     const {order_id} = req.query;
     const num_order_id = parseInt(order_id);
-    console.log(num_order_id);
     const ordered_itens = await get_ordered_items(num_order_id);
-    console.log(ordered_itens);
     if (ordered_itens.length > 0) {
       let food_name = [];
       for (let i = 0; i < ordered_itens.length; i++) {
         const [food_Name] = await get_food_item_name(ordered_itens[i].food_id);
-        console.log("This is data2.food_name", food_Name.food_name);
         food_name.push(food_Name.food_name);
-        console.log(food_name);
-        console.log("Just before render = " + num_order_id);
         res.render("waiting_page.ejs", {
           food_name,
           ordered_itens,
@@ -342,10 +305,8 @@ export const render_waiting = async (req, res) => {
       }
     } else {
       const token = req.cookies.token;
-      console.log("token in auth redirect = " + token);
       const payload = jwt.verify(token, secret);
       const customer_id = await find_customer_id(payload.email);
-      console.log(customer_id);
       const { order_id } = req.query;
       const num_order_id = parseInt(order_id);
       res.redirect(

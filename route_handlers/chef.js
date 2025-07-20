@@ -25,21 +25,16 @@ export const render_chef = (req, res) => {
 export const render_order = async (req, res) => {
   const token = req.cookies.token;
   const payload = jwt.verify(token, secret);
-  // const email = payload.email;
   if (payload.role == "admin") {
     const order_id = req.query.order_id;
-    console.log(order_id);
     const ordered_items = await get_ordered_items(order_id);
-    console.log(ordered_items);
     const check = await status_order_id(order_id);
     if (ordered_items.length > 0) {
       let food_name = [];
       for (let i = 0; i < ordered_items.length; i++) {
         const [food_Name] = await get_food_item_name(ordered_items[i].food_id);
-        console.log("This is data2.food_name", food_Name.food_name);
         food_name.push(food_Name.food_name);
       }
-      console.log(food_name);
 
       res.render("order.ejs", { food_name, ordered_items });
     } else {
@@ -53,20 +48,15 @@ export const render_order = async (req, res) => {
     }
   } else {
     const email = payload.email;
-    console.log(email);
     const chef_data = await find_chef_id(email);
-    console.log(chef_data[0].user_id);
     const order_id = await find_chef_orders(chef_data[0].user_id);
-    console.log(order_id);
     let ordered_items;
     if (order_id != -1) {
       ordered_items = await get_ordered_items(order_id);
-      console.log(ordered_items);
       const check = await status_order_id(order_id);
       let food_name = [];
       for (let i = 0; i < ordered_items.length; i++) {
         const [food_Name] = await get_food_item_name(ordered_items[i].food_id);
-        console.log("This is data2.food_name", food_Name.food_name);
         food_name.push(food_Name.food_name);
       }
       res.render("order.ejs", { ordered_items, food_name });
@@ -78,7 +68,6 @@ export const render_order = async (req, res) => {
 };
 
 export const complete_orderf = async (req, res) => {
-  // res.send(req.body);
   if (req.body == null || req.body == undefined) {
     const error = "There is no valid request for this page please go back and check once more"
     res.render("error_page.ejs" , {error})
@@ -89,7 +78,6 @@ export const complete_orderf = async (req, res) => {
       req.body.food_id,
       req.body.completed
     );
-    console.log("This order id has been turned to completed in ordered table");
     res.redirect("/order");
   }
 };
