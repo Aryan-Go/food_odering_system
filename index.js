@@ -102,6 +102,8 @@ app.post("/complete_item", auth_checker, chef_complete_item, complete_orderf);
 
 app.listen(port, (err) => {
   if (err) {
+    console.log(err)
   } else {
+    console.log(`The port where the localhost is running is = ${port}`)
   }
 });

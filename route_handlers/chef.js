@@ -36,7 +36,7 @@ export const render_order = async (req, res) => {
         food_name.push(food_Name.food_name);
       }
 
-      res.render("order.ejs", { food_name, ordered_items });
+      res.render("order_admin.ejs", { food_name, ordered_items });
     } else {
       if (ordered_items == null || ordered_items == undefined) {
         const error = "There is no such order";

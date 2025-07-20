@@ -220,16 +220,18 @@ export const auth_redirectf = async (req, res) => {
   }
 }
 
+let bcb = false
 export const render_customer = (req, res) => {
-  res.render("customer.ejs");
+  res.render("customer.ejs" , {bcb});
 };
 
 export const customer_cheff = async (req, res) => {
-    const token = req.cookies.token;
-    const payload = jwt.verify(token, secret);
-    const customer_id = await find_customer_id(payload.email);
-    await request_customer_chef(customer_id);
-    res.render("customer_chef.ejs");
+  const token = req.cookies.token;
+  const payload = jwt.verify(token, secret);
+  const customer_id = await find_customer_id(payload.email);
+  await request_customer_chef(customer_id);
+  bcb = true
+  res.render("customer_chef.ejs");
 }
 
 export const render_menu = async (req, res) => {
