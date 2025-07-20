@@ -227,9 +227,6 @@ export const render_customer = (req, res) => {
   if (payload.role == "admin") {
     bcb=true
   }
-  else {
-    bcb=false
-  }
   res.render("customer.ejs" , {bcb});
 };
 
