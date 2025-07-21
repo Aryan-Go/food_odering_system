@@ -84,25 +84,6 @@ export const find_chef_id = async (email) => {
     const [data] = await db.query(`SELECT * FROM user WHERE email = ?;` , [email]);
     return data;
 };
-export const find_chef_id_2 = async () => {
-    const r = "chef";
-  const [data] = await db.query(`SELECT * FROM user WHERE role = ?;`, [r]);
-  return data;
-};
-  
-export const find_chef_free = async (chef_id) => {
-    const [data] = await db.query(`SELECT * FROM order_table WHERE chef_id = (?);`, [chef_id]);
-    let chef;
-    for(const chef_row of data){
-        if (chef_row.food_status == "completed") {
-            chef = chef_row.chef_id;
-        }
-        else {
-            chef = -1;
-        }
-    }
-  return chef;
-};
 
 export const chef_id_free = async() => {
   const role = "chef"
