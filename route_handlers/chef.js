@@ -9,7 +9,6 @@ import {
   find_chef_orders,
   find_chef_id,
   complete_ordered_items,
-  status_order_id,
   get_food_item_name,
 } from "../database_queries/database.js";
 
@@ -28,7 +27,6 @@ export const render_order = async (req, res) => {
   if (payload.role == "admin") {
     const order_id = req.query.order_id;
     const ordered_items = await get_ordered_items(order_id);
-    const check = await status_order_id(order_id);
     if (ordered_items.length > 0) {
       let food_name = [];
       for (let i = 0; i < ordered_items.length; i++) {
@@ -53,7 +51,6 @@ export const render_order = async (req, res) => {
     let ordered_items;
     if (order_id != -1) {
       ordered_items = await get_ordered_items(order_id);
-      const check = await status_order_id(order_id);
       let food_name = [];
       for (let i = 0; i < ordered_items.length; i++) {
         const [food_Name] = await get_food_item_name(ordered_items[i].food_id);

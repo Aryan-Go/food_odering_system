@@ -26,8 +26,6 @@ import {
 } from "./middlewares/user_side.js";
 import {
   admin,
-  customer_chef,
-  request_customer_chef,
 } from "./middlewares/admin.js";
 import { auth_checker } from "./middlewares/food.js";
 

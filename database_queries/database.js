@@ -180,7 +180,6 @@ export const complete_ordered_items = async (order_id,food_id,food_status) => {
     `UPDATE ordered_items SET food_status = ? WHERE order_id = ? AND food_id = ?;`,
     [food_status, order_id, food_id]
   );
-    const check = await status_order_id(order_id);
   return data;
 };
 
@@ -196,15 +195,6 @@ export const status_order_id = async (order_id) => {
       `UPDATE order_table SET food_status = ? WHERE order_id = ? `,[food_status,order_id]
     );
     return 0;
-}
-const status_chef = async (chef_id) => {
-    const [data] = db.query(`SELCT * FROM order_table where chef_id = ?`, [chef_id]);
-    for (const data_row in data) {
-        if (await data_row.food_status == "left") {
-            return -1;
-        }
-    }
-    return chef_id;
 }
 export const get_order_chef_id = async (customer_id) => {
     const food_status = "left";

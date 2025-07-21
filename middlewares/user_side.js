@@ -1,4 +1,3 @@
-import {get_food_item_name} from "../database_queries/database.js";
 export const customer_home = async (req, res, next) => {
   if (req.user.role == "customer") {
     next();
