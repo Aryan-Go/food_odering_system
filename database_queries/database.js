@@ -63,11 +63,6 @@ export const find_password = async (email) => {
   return data[0].password;
 };
 
-
-export const add_menu_items = async (food_name, description, price, category_id) => {
-    await dq.query(`INSERT INTO food_menu (food_name,description,price,category_id) VALUES (? , ?,?,?);`, [food_name, description, price, category_id]);
-}
-
 export const get_food_menu = async (category_id) => {
     const [data] = await db.query(`SELECT * FROM food_menu WHERE category_id=(?)`, [category_id]);
     return data;
@@ -110,36 +105,21 @@ export const find_chef_free = async (chef_id) => {
 };
 
 export const chef_id_free = async() => {
-    const data = await find_chef_id_2();
-    let chef_id;
-    if (data.length > 0) {
-        for (const chef of data) {
-          const [number] = await db.query(
-            `SELECT COUNT(*) AS count FROM order_table WHERE chef_id = (?)`,
-            [chef.user_id]
-          );
-          if (number[0].count == 0) {
-            chef_id = chef.user_id;
-          } else {
-            const check = await find_chef_free(chef.user_id);
-            if (check !== -1) {
-              chef_id = check;
-            } else {
-              chef_id = 0;
-            }
-          }
-        }
-    }
-    else {
-        chef_id = -1;
-    }
-    
-    if (chef_id != 0) {
-        return chef_id;
-    }
-    else {
-        return -1;
-    }
+  const role = "chef"
+  const comp_lef  = "left"
+  const [data] = await db.query(`SELECT user_id  
+                                FROM user
+                                WHERE role = ? AND NOT EXISTS
+                                (SELECT *  
+                                FROM  order_table
+                                WHERE order_table.food_status = ? AND order_table.chef_id = user.user_id);` , [role, comp_lef]);
+  if (data.length > 0) {
+    return data[0].user_id
+  }
+  else {
+    return -1;
+  }
+  
 }
 
 export const add_ordered_items = async (food_id,quantity,special_instructions,order_id) => {
