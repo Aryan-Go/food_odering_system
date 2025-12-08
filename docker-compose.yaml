@@ -1,0 +1,32 @@
+version: '3.8'
+services:
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+      MYSQL_DATABASE: food_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+    ports:
+      - "3307:3306"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile-app
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      DB_HOST: db
+      DB_USER: user
+      DB_PASS: pass
+      DB_NAME: food_db
+      secret: aryan
+    depends_on:
+      - db
+    entrypoint: ["./wait-for-it.sh", "db:3306", "--", "node", "index.js"]
+

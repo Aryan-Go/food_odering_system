@@ -6,7 +6,7 @@ app.use(cookie_parser());
 
 import dotenv from "dotenv";
 dotenv.config();
-const port = process.env.port;
+const port = process.env.PORT;
 
 import { fileURLToPath } from "url";
 import path from "path";

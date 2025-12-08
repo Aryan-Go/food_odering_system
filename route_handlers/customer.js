@@ -139,8 +139,8 @@ export const signup_page = async (req, res) => {
           username,
         });
       }
-    } catch (err) {
-      res.render("error_page.ejs", { err });
+    } catch (error) {
+      res.render("error_page.ejs", { error });
     }
   }
 }

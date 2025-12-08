@@ -1,0 +1,8 @@
+FROM mysql:8
+
+COPY config/basic_commands.sql /docker-entrypoint-initdb.d/basic_commands.sql
+
+ENV MYSQL_ROOT_PASSWORD=rootpass
+ENV MYSQL_DATABASE=food_db
+ENV MYSQL_USER=user
+ENV MYSQL_PASSWORD=pass

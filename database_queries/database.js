@@ -1,17 +1,16 @@
 import mysql from "mysql2/promise";
 import dotenv from "dotenv";
 dotenv.config();
-const host = process.env.host;
-const user = process.env.user;
-const password = process.env.password;
-
-
+const host = process.env.DB_HOST;
+const user = process.env.DB_USER;
+const password = process.env.DB_PASS;
+const database = process.env.DB_NAME || "food_db";
 
 const db = await mysql.createConnection({
-    host: host,
-    password: password,
-    user: user,
-    database:"food"
+  host,
+  user,
+  password,
+  database,
 });
 
 export const add_data = async (username, role, password, email) => {
