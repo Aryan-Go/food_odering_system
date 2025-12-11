@@ -12,7 +12,7 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "bootstrap": "^5.3.6",
+    "bootstrap": "^5.3.7",
     "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
     "dotenv": "^16.5.0",
